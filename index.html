@@ -5,590 +5,487 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#020b12">
-<title>JABABENDA PROJECT | Sprayday Assistance</title>
+<meta name="theme-color" content="#030d08">
+<title>HYDRA-32 | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- MQTT over WebSocket (works on HTTPS pages) -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --c:#00fff7;--c2:#00c8c2;--c3:#003d3b;
-  --g:#00ff88;--g2:#00b860;--gd:#003d22;
-  --r:#ff3366;--r2:#cc0044;--rd:#3d0011;
-  --a:#ffaa00;--a2:#cc8800;
-  --pu:#7c3aed;--pu2:#a78bfa;--pu3:#2d0b6e;
-  --bg:#020b12;--bg2:#040e18;--bg3:#050f1c;
-  --bo:#0a2535;--bo2:#0e3248;
-  --t1:#dff5f4;--t2:#7ab8c0;--t3:#3a6870;
+  /* Agroteknologi palette: deep forest + neon leaf + soil amber */
+  --forest:#0a1f0e;--forest2:#0d2612;--forest3:#102d15;
+  --leaf:#2dff7a;--leaf2:#00e060;--leaf3:#00b84a;
+  --soil:#8b4513;--soil2:#a05722;--amber:#d4a017;--amber2:#f0c040;
+  --cyan:#00fff7;--cyan2:#00c8c2;
+  --pu:#7c3aed;--pu2:#a78bfa;
+  --r:#ff3355;--r2:#cc1133;
+  --bg:#020c05;--bg2:#040f07;--bg3:#060f09;--bg4:#081209;
+  --bo:#0e2e14;--bo2:#163820;--bo3:#1a4228;
+  --t1:#d4f5e0;--t2:#6fa882;--t3:#345c42;
   --sp:env(safe-area-inset-bottom,0px);
-  --font-mono:'Share Tech Mono',monospace;
-  --font-title:'Orbitron',sans-serif;
-  --font-body:'Rajdhani',sans-serif;
+  --mono:'Share Tech Mono',monospace;
+  --title:'Orbitron',sans-serif;
+  --body:'Rajdhani',sans-serif;
+  --prose:'Space Grotesk',sans-serif;
 }
-html{height:100%;font-size:16px}
+html{height:100%}
 body{min-height:100%;background:var(--bg);color:var(--t1);
-  font-family:var(--font-mono);overflow-x:hidden;
-  -webkit-font-smoothing:antialiased}
+  font-family:var(--mono);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ═══════════ BACKGROUND FX ═══════════ */
-.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
-#bggrid{background-image:
-  linear-gradient(rgba(0,255,247,.02) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(0,255,247,.02) 1px,transparent 1px);
-  background-size:44px 44px;animation:bgScroll 25s linear infinite}
-@keyframes bgScroll{to{background-position:44px 44px}}
-#bgscan{background:repeating-linear-gradient(0deg,transparent,transparent 2px,
-  rgba(0,0,0,.022) 2px,rgba(0,0,0,.022) 4px)}
-#bgaura{background:
-  radial-gradient(ellipse 55% 35% at 15% 8%,rgba(124,58,237,.055),transparent 70%),
-  radial-gradient(ellipse 45% 30% at 85% 92%,rgba(0,255,247,.035),transparent 70%),
-  radial-gradient(ellipse 40% 25% at 50% 50%,rgba(0,180,100,.02),transparent 70%)}
-#bgparticles{overflow:hidden}
-.particle{position:absolute;width:1px;height:1px;background:rgba(0,255,247,.4);
-  border-radius:50%;animation:particleFloat linear infinite}
-@keyframes particleFloat{
-  0%{transform:translateY(100vh) translateX(0);opacity:0}
-  10%{opacity:1}90%{opacity:.3}
-  100%{transform:translateY(-20px) translateX(20px);opacity:0}}
+/* ═══ BACKGROUND ═══ */
+.bgl{position:fixed;inset:0;pointer-events:none;z-index:0}
+#bgGrid{
+  background-image:
+    linear-gradient(rgba(45,255,122,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(45,255,122,.018) 1px,transparent 1px);
+  background-size:48px 48px;animation:bgScroll 28s linear infinite}
+@keyframes bgScroll{to{background-position:48px 48px}}
+#bgAura{background:
+  radial-gradient(ellipse 60% 40% at 10% 5%,rgba(45,255,122,.04),transparent 70%),
+  radial-gradient(ellipse 50% 35% at 90% 95%,rgba(0,180,74,.035),transparent 70%),
+  radial-gradient(ellipse 35% 25% at 50% 50%,rgba(139,69,19,.02),transparent 70%)}
+#bgScan{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.018) 2px,rgba(0,0,0,.018) 4px)}
+#bgParticles{overflow:hidden}
+.ptcl{position:absolute;border-radius:50%;animation:ptclFloat linear infinite}
+@keyframes ptclFloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:.2}100%{transform:translateY(-30px) translateX(15px);opacity:0}}
 
-/* ═══════════ LOADING SCREEN ═══════════ */
+/* ═══ LOADING ═══ */
 #load{position:fixed;inset:0;z-index:9999;background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity 1s ease,visibility 1s}
+  transition:opacity 1s,visibility 1s}
 #load.out{opacity:0;visibility:hidden;pointer-events:none}
-
-.load-orbit{position:relative;width:160px;height:160px;margin-bottom:32px}
-.load-ring{position:absolute;border-radius:50%;border:2px solid transparent}
-.lr1{inset:0;border-top-color:var(--c);border-right-color:rgba(0,255,247,.2);
-  animation:spin 1.4s linear infinite;
-  box-shadow:0 0 24px rgba(0,255,247,.18)}
-.lr2{inset:12px;border-bottom-color:var(--pu2);border-left-color:rgba(167,139,250,.2);
-  animation:spin 2s linear infinite reverse;
-  box-shadow:0 0 16px rgba(124,58,237,.2)}
-.lr3{inset:22px;border-top-color:rgba(0,255,136,.4);
-  animation:spin 2.8s linear infinite}
-.lr4{inset:32px;border-right-color:rgba(255,170,0,.25);
-  animation:spin 3.6s linear infinite reverse}
+.ls-orbit{position:relative;width:164px;height:164px;margin-bottom:30px}
+.ls-r{position:absolute;border-radius:50%;border:2px solid transparent}
+.ls-r1{inset:0;border-top-color:var(--leaf);border-right-color:rgba(45,255,122,.2);animation:spin 1.4s linear infinite;box-shadow:0 0 24px rgba(45,255,122,.15)}
+.ls-r2{inset:13px;border-bottom-color:var(--amber2);border-left-color:rgba(212,160,23,.2);animation:spin 2s linear infinite reverse;box-shadow:0 0 16px rgba(212,160,23,.15)}
+.ls-r3{inset:24px;border-top-color:rgba(0,255,247,.3);animation:spin 2.9s linear infinite}
+.ls-r4{inset:35px;border-right-color:rgba(45,255,122,.15);animation:spin 3.8s linear infinite reverse}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-core{position:absolute;inset:42px;border-radius:50%;
-  background:radial-gradient(circle at 40% 36%,#0d1f42,var(--bg));
-  border:1px solid rgba(0,255,247,.1);
-  display:flex;align-items:center;justify-content:center}
-.load-core svg{width:52px;height:52px}
+.ls-core{position:absolute;inset:44px;border-radius:50%;
+  background:radial-gradient(circle at 40% 36%,#0d2a12,var(--bg));
+  border:1px solid rgba(45,255,122,.12);
+  display:flex;align-items:center;justify-content:center;font-size:2rem}
+.ls-title{font-family:var(--title);font-size:1.1rem;font-weight:900;letter-spacing:2px;
+  text-align:center;margin-bottom:4px;
+  background:linear-gradient(135deg,var(--leaf),var(--amber2),var(--leaf));
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 3s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.ls-tag{font-size:.54rem;letter-spacing:5px;color:var(--t2);margin-bottom:28px;opacity:.6}
+.ls-track{width:230px;height:2px;background:rgba(45,255,122,.07);border-radius:99px;overflow:hidden}
+.ls-fill{height:100%;width:0;background:linear-gradient(90deg,var(--leaf3),var(--leaf),var(--amber2));
+  animation:lsBar 2.8s ease-out forwards;box-shadow:0 0 10px var(--leaf)}
+@keyframes lsBar{0%{width:0}15%{width:22%}45%{width:58%}75%{width:84%}92%{width:96%}100%{width:100%}}
+.ls-msg{font-size:.54rem;letter-spacing:2.5px;color:var(--t2);margin-top:12px;opacity:.45;min-height:14px}
 
-.load-title{font-family:var(--font-title);font-size:1.2rem;font-weight:900;
-  letter-spacing:2px;text-align:center;margin-bottom:4px;
-  background:linear-gradient(135deg,var(--c),var(--pu2),var(--c));
-  background-size:200%;-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmerText 3s linear infinite}
-@keyframes shimmerText{to{background-position:-200% 0}}
-.load-sub{font-size:.55rem;letter-spacing:5px;color:var(--t2);
-  margin-bottom:28px;opacity:.6}
-.load-track{width:230px;height:2px;background:rgba(0,255,247,.07);
-  border-radius:99px;overflow:hidden}
-.load-fill{height:100%;width:0;border-radius:99px;
-  background:linear-gradient(90deg,var(--pu2),var(--c),var(--g));
-  animation:loadBar 2.8s ease-out forwards;
-  box-shadow:0 0 12px var(--c)}
-@keyframes loadBar{
-  0%{width:0}15%{width:20%}40%{width:55%}70%{width:80%}90%{width:94%}100%{width:100%}}
-.load-msg{font-size:.55rem;letter-spacing:2.5px;color:var(--t2);
-  margin-top:12px;opacity:.5;min-height:14px;text-align:center}
+/* ═══ APP ═══ */
+#connBar{position:fixed;top:0;inset-inline:0;z-index:100;height:2px;transition:background .5s}
+#connBar.ok{background:linear-gradient(90deg,transparent,var(--leaf),transparent)}
+#connBar.err{background:linear-gradient(90deg,transparent,var(--r),transparent);animation:cPulse 1.5s infinite}
+@keyframes cPulse{50%{opacity:.3}}
 
-/* ═══════════ CONN STATUS BAR ═══════════ */
-#connBar{position:fixed;top:0;left:0;right:0;z-index:100;
-  height:3px;background:transparent;transition:background .4s}
-#connBar.ok{background:linear-gradient(90deg,transparent,var(--g),transparent)}
-#connBar.err{background:linear-gradient(90deg,transparent,var(--r),transparent);
-  animation:connPulse 1.5s infinite}
-@keyframes connPulse{50%{opacity:.4}}
-
-/* ═══════════ APP SHELL ═══════════ */
 #app{position:relative;z-index:2;max-width:760px;margin:0 auto;
-  padding:18px 14px calc(96px + var(--sp));
+  padding:16px 14px calc(96px + var(--sp));
   transition:opacity .5s,filter .5s}
 #app.dim{opacity:.15;filter:blur(5px) saturate(.2);pointer-events:none}
 
-/* ═══════════ HEADER ═══════════ */
-.hdr{text-align:center;padding:14px 0 22px}
-.logo{font-family:var(--font-title);
-  font-size:clamp(1.6rem,5.5vw,2.4rem);font-weight:900;
-  color:var(--c);letter-spacing:clamp(4px,1.5vw,10px);
-  text-shadow:0 0 22px var(--c),0 0 55px rgba(0,255,247,.3);
-  animation:logoFlicker 7s infinite}
-@keyframes logoFlicker{
-  0%,90%,100%{text-shadow:0 0 22px var(--c),0 0 55px rgba(0,255,247,.3)}
-  91%{text-shadow:0 0 8px var(--c);opacity:.8}
-  93%{opacity:.5;text-shadow:none}95%{opacity:1;text-shadow:0 0 22px var(--c)}}
-.logo-sub{font-size:.56rem;letter-spacing:5px;color:var(--t2);
-  margin-top:5px;opacity:.65}
+/* ═══ HEADER ═══ */
+.hdr{text-align:center;padding:12px 0 20px}
+.logo{font-family:var(--title);font-size:clamp(1.5rem,5.5vw,2.3rem);font-weight:900;
+  color:var(--leaf);letter-spacing:clamp(3px,1.5vw,9px);
+  text-shadow:0 0 20px var(--leaf),0 0 50px rgba(45,255,122,.25);
+  animation:logoFx 7s infinite}
+@keyframes logoFx{0%,90%,100%{text-shadow:0 0 20px var(--leaf),0 0 50px rgba(45,255,122,.25)}
+  91%{opacity:.8;text-shadow:0 0 8px var(--leaf)}93%{opacity:.5}95%{opacity:1;text-shadow:0 0 20px var(--leaf)}}
+.logo-sub{font-size:.55rem;letter-spacing:5px;color:var(--t2);margin-top:4px;opacity:.6}
 .hline{height:1px;margin:12px 0;
-  background:linear-gradient(90deg,transparent,var(--c),transparent);
-  box-shadow:0 0 10px rgba(0,255,247,.35)}
+  background:linear-gradient(90deg,transparent,var(--leaf),var(--amber2),var(--leaf),transparent);
+  box-shadow:0 0 8px rgba(45,255,122,.3)}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.live-ind{display:flex;align-items:center;gap:6px;font-size:.56rem;
-  letter-spacing:2px;color:var(--g)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--g);
-  box-shadow:0 0 8px var(--g);animation:livePulse 1.1s infinite}
-@keyframes livePulse{50%{transform:scale(1.8);opacity:.4}}
-.mode-pill{font-family:var(--font-title);font-size:.58rem;font-weight:700;
-  letter-spacing:2.5px;padding:5px 14px;border-radius:2px;
-  border:1px solid var(--c);color:var(--c);
-  background:rgba(0,255,247,.03);
-  box-shadow:0 0 10px rgba(0,255,247,.1);transition:all .4s}
-.mode-pill.man{color:var(--a);border-color:var(--a);
-  box-shadow:0 0 10px rgba(255,170,0,.12)}
+.live-pill{display:flex;align-items:center;gap:6px;font-size:.56rem;letter-spacing:2px;color:var(--leaf)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--leaf);
+  box-shadow:0 0 8px var(--leaf);animation:ldPulse 1.1s infinite}
+@keyframes ldPulse{50%{transform:scale(1.8);opacity:.3}}
+.mode-pill{font-family:var(--title);font-size:.58rem;font-weight:700;letter-spacing:2.5px;
+  padding:5px 14px;border-radius:2px;border:1px solid var(--leaf);color:var(--leaf);
+  background:rgba(45,255,122,.03);box-shadow:0 0 10px rgba(45,255,122,.08);transition:all .4s}
+.mode-pill.man{color:var(--amber2);border-color:var(--amber2);box-shadow:0 0 10px rgba(240,192,64,.1)}
 
-/* ═══════════ PANELS ═══════════ */
+/* ═══ PANELS ═══ */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 @media(max-width:420px){.g2{grid-template-columns:1fr}}
-
 .pnl{background:var(--bg3);border:1px solid var(--bo);border-radius:4px;
-  padding:16px;position:relative;overflow:hidden;transition:border-color .3s,transform .2s}
+  padding:16px;position:relative;overflow:hidden;transition:border-color .3s}
 .pnl:hover{border-color:var(--bo2)}
 .pnl::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(0,255,247,.4),transparent)}
+  background:linear-gradient(90deg,transparent,rgba(45,255,122,.35),transparent)}
 .pnl::after{content:'';position:absolute;bottom:4px;right:4px;width:8px;height:8px;
-  border-bottom:1px solid rgba(0,255,247,.25);border-right:1px solid rgba(0,255,247,.25)}
+  border-bottom:1px solid rgba(45,255,122,.2);border-right:1px solid rgba(45,255,122,.2)}
 .plbl{font-size:.55rem;letter-spacing:3px;color:var(--t2);
-  text-transform:uppercase;margin-bottom:13px;
-  display:flex;align-items:center;gap:7px}
-.plbl-dot{width:3px;height:3px;border-radius:50%;background:var(--c);
-  box-shadow:0 0 6px var(--c)}
+  text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.plbl::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--leaf);
+  box-shadow:0 0 6px var(--leaf);flex-shrink:0}
 
-/* ═══════════ GAUGE ═══════════ */
+/* ═══ GAUGE ═══ */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
-.gauge-svg{width:100%;max-width:152px}
-.gauge-badge{font-size:.62rem;letter-spacing:2px;padding:4px 14px;
-  border-radius:2px;text-align:center;transition:all .4s;
-  color:var(--c);border:1px solid rgba(0,255,247,.28);background:rgba(0,255,247,.05)}
-.gauge-badge.dry{color:var(--r);border-color:rgba(255,51,102,.3);
-  background:rgba(255,51,102,.06);animation:badgeBlink .85s infinite}
-.gauge-badge.wet{color:var(--g);border-color:rgba(0,255,136,.3);
-  background:rgba(0,255,136,.06)}
-@keyframes badgeBlink{50%{opacity:.35}}
-.thresh-row{display:flex;gap:6px;width:100%}
-.tc{flex:1;text-align:center;padding:5px 3px;border-radius:2px;
-  font-size:.56rem;letter-spacing:1px}
-.tc-d{border:1px solid rgba(255,51,102,.25);color:rgba(255,51,102,.7)}
-.tc-w{border:1px solid rgba(0,255,136,.25);color:rgba(0,255,136,.7)}
+.gauge-svg{width:100%;max-width:154px}
+.gbadge{font-size:.62rem;letter-spacing:2px;padding:4px 14px;border-radius:2px;
+  text-align:center;transition:all .4s;
+  color:var(--leaf);border:1px solid rgba(45,255,122,.25);background:rgba(45,255,122,.05)}
+.gbadge.dry{color:var(--r);border-color:rgba(255,51,85,.28);background:rgba(255,51,85,.05);animation:blinkR .85s infinite}
+.gbadge.wet{color:var(--leaf);border-color:rgba(45,255,122,.28);background:rgba(45,255,122,.07)}
+@keyframes blinkR{50%{opacity:.3}}
+.tc-row{display:flex;gap:6px;width:100%}
+.tc{flex:1;text-align:center;padding:5px 3px;border-radius:2px;font-size:.56rem;letter-spacing:1px}
+.tc-d{border:1px solid rgba(255,51,85,.22);color:rgba(255,80,100,.7)}
+.tc-w{border:1px solid rgba(45,255,122,.22);color:rgba(45,255,122,.7)}
 
-/* ═══════════ PUMP ═══════════ */
-.pump-center{display:flex;flex-direction:column;align-items:center;
-  padding:4px 0 10px;gap:7px}
+/* ═══ PUMP ═══ */
+.pump-c{display:flex;flex-direction:column;align-items:center;padding:4px 0 10px;gap:7px}
 .pump-orb{width:84px;height:84px;border-radius:50%;position:relative;
   display:flex;align-items:center;justify-content:center;
   border:2px solid var(--bo2);transition:all .7s}
-.pump-orb.on{border-color:var(--g);
-  box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),
-  inset 0 0 22px rgba(0,255,136,.08);
-  animation:orbGlow 3.5s linear infinite}
-@keyframes orbGlow{
-  0%  {box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),0 -24px 16px rgba(0,255,136,.22),inset 0 0 20px rgba(0,255,136,.07)}
-  25% {box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),24px 0 16px rgba(0,255,136,.22),inset 0 0 20px rgba(0,255,136,.07)}
-  50% {box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),0 24px 16px rgba(0,255,136,.22),inset 0 0 20px rgba(0,255,136,.07)}
-  75% {box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),-24px 0 16px rgba(0,255,136,.22),inset 0 0 20px rgba(0,255,136,.07)}
-  100%{box-shadow:0 0 0 5px rgba(0,255,136,.07),0 0 26px rgba(0,255,136,.45),0 -24px 16px rgba(0,255,136,.22),inset 0 0 20px rgba(0,255,136,.07)}}
+.pump-orb.on{border-color:var(--leaf);
+  box-shadow:0 0 0 5px rgba(45,255,122,.06),0 0 26px rgba(45,255,122,.4),inset 0 0 22px rgba(45,255,122,.07);
+  animation:pumpOrb 3.5s linear infinite}
+@keyframes pumpOrb{
+  0%  {box-shadow:0 0 0 5px rgba(45,255,122,.06),0 0 26px rgba(45,255,122,.4),0 -24px 16px rgba(45,255,122,.2),inset 0 0 20px rgba(45,255,122,.06)}
+  50% {box-shadow:0 0 0 5px rgba(45,255,122,.06),0 0 26px rgba(45,255,122,.4),0  24px 16px rgba(45,255,122,.2),inset 0 0 20px rgba(45,255,122,.06)}
+  100%{box-shadow:0 0 0 5px rgba(45,255,122,.06),0 0 26px rgba(45,255,122,.4),0 -24px 16px rgba(45,255,122,.2),inset 0 0 20px rgba(45,255,122,.06)}}
 .pump-inner{width:62px;height:62px;border-radius:50%;
-  background:radial-gradient(circle at 38% 34%,#0a1f32,var(--bg));
+  background:radial-gradient(circle at 38% 34%,#0d2a12,var(--bg));
   display:flex;align-items:center;justify-content:center;
   border:1px solid var(--bo);font-size:1.5rem;transition:all .5s}
-.pump-state{font-family:var(--font-title);font-size:.82rem;font-weight:700;
+.pump-state{font-family:var(--title);font-size:.8rem;font-weight:700;
   letter-spacing:3px;color:var(--bo2);transition:all .5s}
-.pump-state.on{color:var(--g);text-shadow:0 0 16px rgba(0,255,136,.55)}
-.pump-sub{font-size:.55rem;letter-spacing:2px;color:var(--bo2);transition:all .5s}
-.pump-sub.on{color:rgba(0,255,136,.55)}
+.pump-state.on{color:var(--leaf);text-shadow:0 0 14px rgba(45,255,122,.5)}
+.pump-sub{font-size:.54rem;letter-spacing:2px;color:var(--bo2);transition:all .5s}
+.pump-sub.on{color:rgba(45,255,122,.5)}
 .spec-list{width:100%;margin-top:6px;display:flex;flex-direction:column;gap:3px}
 .spec-row{display:flex;justify-content:space-between;font-size:.6rem;
-  padding:4px 0;border-bottom:1px solid rgba(10,37,53,.7)}
+  padding:4px 0;border-bottom:1px solid rgba(14,46,20,.7)}
 .spec-row:last-child{border-bottom:none}
 .sk{color:var(--t2)}.sv{color:var(--t1);font-weight:600}
 
-/* ═══════════ DATA BARS ═══════════ */
+/* ═══ BARS ═══ */
 .dbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.65rem}
 .dbar:last-child{margin-bottom:0}
-.db-l{color:var(--t2);letter-spacing:1px;min-width:72px;white-space:nowrap}
-.db-t{flex:1;height:3px;background:rgba(10,37,53,.9);border-radius:2px;overflow:hidden}
-.db-f{height:100%;border-radius:2px;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
-.fc{background:linear-gradient(90deg,var(--c2),var(--c));box-shadow:0 0 5px rgba(0,255,247,.5)}
-.fr{background:linear-gradient(90deg,var(--r2),var(--r));box-shadow:0 0 5px rgba(255,51,102,.4)}
-.fg{background:linear-gradient(90deg,var(--g2),var(--g));box-shadow:0 0 5px rgba(0,255,136,.4)}
-.db-v{color:var(--t1);font-weight:700;min-width:30px;text-align:right}
+.dbl{color:var(--t2);letter-spacing:1px;min-width:72px;white-space:nowrap}
+.dbt{flex:1;height:3px;background:rgba(14,46,20,.9);border-radius:2px;overflow:hidden}
+.dbf{height:100%;border-radius:2px;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.fg{background:linear-gradient(90deg,var(--leaf3),var(--leaf));box-shadow:0 0 5px rgba(45,255,122,.5)}
+.fr{background:linear-gradient(90deg,var(--r2),var(--r));box-shadow:0 0 5px rgba(255,51,85,.4)}
+.fa{background:linear-gradient(90deg,var(--amber),var(--amber2));box-shadow:0 0 5px rgba(212,160,23,.4)}
+.dbv{color:var(--t1);font-weight:700;min-width:30px;text-align:right}
 
-/* ═══════════ QUICK ACTIONS ═══════════ */
+/* ═══ QUICK ACTIONS ═══ */
 .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .qbtn{background:var(--bg3);border:1px solid var(--bo);border-radius:3px;
   padding:14px 10px;cursor:pointer;transition:all .25s;
   display:flex;flex-direction:column;align-items:center;gap:6px;
-  font-family:var(--font-mono);user-select:none;-webkit-user-select:none}
-.qbtn:active{transform:scale(.95);opacity:.8}
-.qbtn.q-on:hover{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.03)}
-.qbtn.q-off:hover{border-color:rgba(255,51,102,.4);background:rgba(255,51,102,.03)}
-.qbtn.q-data:hover{border-color:rgba(0,255,247,.4);background:rgba(0,255,247,.03)}
-.qbtn.q-ai:hover{border-color:rgba(167,139,250,.4);background:rgba(124,58,237,.03)}
-.qi{font-size:1.5rem}
-.ql{font-size:.58rem;letter-spacing:1.5px;color:var(--t2);text-align:center;line-height:1.4}
+  font-family:var(--mono);user-select:none}
+.qbtn:active{transform:scale(.95)}
+.qbtn.q-on:hover{border-color:rgba(45,255,122,.35);background:rgba(45,255,122,.03)}
+.qbtn.q-off:hover{border-color:rgba(255,51,85,.35);background:rgba(255,51,85,.03)}
+.qbtn.q-data:hover{border-color:rgba(0,255,247,.35);background:rgba(0,255,247,.03)}
+.qbtn.q-ai:hover{border-color:rgba(212,160,23,.35);background:rgba(212,160,23,.03)}
+.qi{font-size:1.5rem}.ql{font-size:.57rem;letter-spacing:1.5px;color:var(--t2);text-align:center}
 
-/* ═══════════ CONTROLS ═══════════ */
+/* ═══ CONTROLS ═══ */
 .ctrl-row{display:flex;align-items:center;justify-content:space-between;
-  padding:13px 0;border-bottom:1px solid rgba(10,37,53,.8)}
+  padding:13px 0;border-bottom:1px solid rgba(14,46,20,.8)}
 .ctrl-row:last-child{border-bottom:none}
 .ct{font-size:.7rem;letter-spacing:2px;color:var(--t1);margin-bottom:2px}
 .cs{font-size:.56rem;letter-spacing:1px;color:var(--t2);opacity:.65}
 .sw{position:relative;width:50px;height:24px;flex-shrink:0}
 .sw input{opacity:0;width:0;height:0;position:absolute}
-.sl{position:absolute;inset:0;background:#04111a;
-  border:1px solid rgba(14,50,72,.8);border-radius:2px;
-  cursor:pointer;transition:.35s}
-.sl::before{content:'';position:absolute;width:16px;height:14px;
-  background:#1a3040;left:3px;top:4px;border-radius:1px;transition:.35s}
-input:checked+.sl{border-color:var(--c);background:rgba(0,255,247,.03);
-  box-shadow:0 0 10px rgba(0,255,247,.18)}
-input:checked+.sl::before{transform:translateX(26px);background:var(--c);
-  box-shadow:0 0 8px rgba(0,255,247,.6)}
+.sl{position:absolute;inset:0;background:#040f07;border:1px solid rgba(22,56,32,.8);
+  border-radius:2px;cursor:pointer;transition:.35s}
+.sl::before{content:'';position:absolute;width:16px;height:14px;background:#163820;
+  left:3px;top:4px;border-radius:1px;transition:.35s}
+input:checked+.sl{border-color:var(--leaf);background:rgba(45,255,122,.03);
+  box-shadow:0 0 10px rgba(45,255,122,.15)}
+input:checked+.sl::before{transform:translateX(26px);background:var(--leaf);
+  box-shadow:0 0 8px rgba(45,255,122,.6)}
 input:disabled+.sl{opacity:.25;cursor:not-allowed}
 
-/* ═══════════ LOG ═══════════ */
-.logbox{background:#010a10;border:1px solid var(--bo);border-radius:2px;
-  padding:8px 12px;height:78px;overflow-y:auto;
-  font-size:.58rem;line-height:1.9}
+/* ═══ LOG ═══ */
+.logbox{background:#010a03;border:1px solid var(--bo);border-radius:2px;
+  padding:8px 12px;height:78px;overflow-y:auto;font-size:.57rem;line-height:1.9}
 .logbox::-webkit-scrollbar{width:2px}
-.logbox::-webkit-scrollbar-thumb{background:rgba(0,255,247,.12)}
-.ll{color:rgba(0,190,185,.55)}.lo{color:var(--g)}.lw{color:var(--a)}.le{color:var(--r)}
+.logbox::-webkit-scrollbar-thumb{background:rgba(45,255,122,.1)}
+.ll{color:rgba(80,180,110,.5)}.lo{color:var(--leaf)}.lw{color:var(--amber2)}.le{color:var(--r)}
 
-/* ═══════════ CONN INFO ═══════════ */
+/* ═══ CONN CARD ═══ */
 .conn-card{display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:8px;padding:10px 14px;
-  background:rgba(4,14,24,.8);border:1px solid var(--bo);
-  border-radius:3px;margin-bottom:12px;font-size:.6rem}
-.conn-item{display:flex;flex-direction:column;gap:2px}
-.conn-k{color:var(--t3);letter-spacing:1px;font-size:.52rem}
-.conn-v{color:var(--t1);font-weight:600}
-.conn-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.conn-dot.ok{background:var(--g);box-shadow:0 0 8px var(--g);animation:livePulse 1.1s infinite}
-.conn-dot.err{background:var(--r);box-shadow:0 0 8px var(--r)}
-.conn-dot.wait{background:var(--a);animation:livePulse 1.1s infinite}
+  background:rgba(4,10,6,.8);border:1px solid var(--bo);border-radius:3px;margin-bottom:12px;font-size:.6rem}
+.ck{color:var(--t3);letter-spacing:1px;font-size:.5rem}
+.cv{color:var(--t1);font-weight:600}
+.cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cdot.ok{background:var(--leaf);box-shadow:0 0 8px var(--leaf);animation:ldPulse 1.1s infinite}
+.cdot.err{background:var(--r);box-shadow:0 0 6px var(--r)}
+.cdot.wait{background:var(--amber2);animation:ldPulse 1.4s infinite}
 
-.app-footer{text-align:center;font-size:.5rem;color:var(--t3);
-  opacity:.3;letter-spacing:2px;padding:14px 0}
+.app-footer{text-align:center;font-size:.5rem;color:var(--t3);opacity:.28;letter-spacing:2px;padding:12px 0}
 
-/* ═══════════ FAB ═══════════ */
+/* ═══ FAB ═══ */
 #fab{position:fixed;bottom:calc(22px + var(--sp));right:18px;z-index:200;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;user-select:none}
-.fab-ring{width:62px;height:62px;border-radius:50%;
-  background:radial-gradient(circle at 38% 36%,#220c5e,#080218);
-  border:2px solid var(--pu2);
+  display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;user-select:none}
+.fab-orb{width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 38% 36%,#1a3c0e,#060e04);
+  border:2px solid var(--leaf);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 26px rgba(124,58,237,.55),0 0 50px rgba(124,58,237,.12);
-  animation:fabGlow 3s infinite;transition:transform .2s}
-.fab-ring:active{transform:scale(.9)}
-@keyframes fabGlow{
-  0%,100%{box-shadow:0 0 26px rgba(124,58,237,.55),0 0 50px rgba(124,58,237,.12)}
-  50%{box-shadow:0 0 38px rgba(124,58,237,.8),0 0 75px rgba(124,58,237,.3)}}
-.fab-label{font-family:var(--font-title);font-size:.38rem;
-  letter-spacing:1.5px;color:var(--pu2);text-align:center;line-height:1.4}
+  box-shadow:0 0 24px rgba(45,255,122,.4),0 0 48px rgba(45,255,122,.1);
+  animation:fabPulse 3s infinite;transition:transform .2s}
+.fab-orb:active{transform:scale(.9)}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 0 24px rgba(45,255,122,.4),0 0 48px rgba(45,255,122,.1)}
+  50%{box-shadow:0 0 36px rgba(45,255,122,.7),0 0 72px rgba(45,255,122,.2)}}
+.fab-lbl{font-family:var(--title);font-size:.37rem;letter-spacing:1.5px;color:var(--leaf);text-align:center;line-height:1.4}
 
-/* ═══════════ SPRAYDAY MODAL ═══════════ */
+/* ═══════════════════════════════════════
+   SPRAYDAY MODAL — AI Agriculture Assistant
+═══════════════════════════════════════ */
 #sdModal{display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(1,5,12,.97);backdrop-filter:blur(16px)}
+  background:rgba(1,6,2,.97);backdrop-filter:blur(18px)}
 #sdModal.open{display:flex;flex-direction:column}
 .sd-shell{width:100%;max-width:760px;margin:0 auto;height:100%;
   display:flex;flex-direction:column;padding:0 14px;
   padding-bottom:calc(14px + var(--sp))}
 
+/* Header */
 .sd-top{display:flex;align-items:center;justify-content:space-between;
-  padding:18px 0 6px;flex-shrink:0}
-.sd-wordmark{font-family:var(--font-title);font-size:1.15rem;font-weight:900;
-  letter-spacing:5px;
-  background:linear-gradient(135deg,var(--pu2),var(--c),var(--pu2));
-  background-size:200%;-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmerText 4s linear infinite}
+  padding:16px 0 6px;flex-shrink:0}
+.sd-brand{display:flex;flex-direction:column;gap:2px}
+.sd-wordmark{font-family:var(--title);font-size:1.15rem;font-weight:900;letter-spacing:5px;
+  background:linear-gradient(135deg,var(--leaf),var(--amber2),var(--leaf));
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:shimmer 4s linear infinite}
+.sd-tagline{font-size:.52rem;letter-spacing:3px;color:var(--t2);opacity:.6}
 .sd-close{background:none;border:1px solid var(--bo);color:var(--t2);
-  width:34px;height:34px;border-radius:2px;cursor:pointer;
-  font-size:.9rem;display:flex;align-items:center;justify-content:center;
-  transition:all .25s;font-family:var(--font-mono)}
+  width:34px;height:34px;border-radius:2px;cursor:pointer;font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;transition:all .25s;font-family:var(--mono)}
 .sd-close:hover{border-color:var(--r);color:var(--r)}
 
-.av-wrap{display:flex;flex-direction:column;align-items:center;
-  padding:10px 0 8px;flex-shrink:0}
-.av-rings{position:relative;width:96px;height:96px}
+/* Avatar */
+.av-section{display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;flex-shrink:0}
+.av-rings{position:relative;width:100px;height:100px}
 .av-r{position:absolute;border-radius:50%;border:2px solid transparent}
-.av-r1{inset:0;border-top-color:var(--pu2);border-right-color:rgba(167,139,250,.2);
-  animation:spin 3.5s linear infinite}
-.av-r2{inset:10px;border-bottom-color:rgba(0,255,247,.35);
-  animation:spin 6s linear infinite reverse}
-.av-r3{inset:20px;border-left-color:rgba(0,255,136,.2);
-  animation:spin 9s linear infinite}
-.av-core{position:absolute;inset:18px;border-radius:50%;
-  background:radial-gradient(circle at 38% 35%,#270e6a,#04010e);
-  border:1px solid rgba(124,58,237,.28);
-  display:flex;align-items:center;justify-content:center}
-.av-svg{width:40px;height:40px}
+.av-r1{inset:0;border-top-color:var(--leaf);border-right-color:rgba(45,255,122,.2);animation:spin 3.5s linear infinite}
+.av-r2{inset:10px;border-bottom-color:var(--amber2);border-left-color:rgba(212,160,23,.2);animation:spin 6s linear infinite reverse}
+.av-r3{inset:20px;border-left-color:rgba(0,255,247,.25);animation:spin 9s linear infinite}
+.av-core{position:absolute;inset:20px;border-radius:50%;
+  background:radial-gradient(circle at 38% 35%,#122a0a,#030803);
+  border:1px solid rgba(45,255,122,.2);
+  display:flex;align-items:center;justify-content:center;font-size:2rem}
 
-.waveform{display:flex;align-items:center;justify-content:center;
-  gap:3px;height:26px;margin:6px 0 4px;flex-shrink:0}
-.wb{width:3px;border-radius:2px;background:var(--pu2);height:3px;transition:background .3s}
-.waveform.listening .wb{background:var(--g);animation:wvA .5s infinite ease-in-out}
-.waveform.speaking .wb{animation:wvA .28s infinite ease-in-out}
-.wb:nth-child(1){animation-delay:.00s}.wb:nth-child(2){animation-delay:.07s}
+/* Waveform */
+.waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:26px;margin:6px 0 3px;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--leaf);height:3px}
+.waveform.listening .wb{background:var(--leaf);animation:wvA .5s infinite ease-in-out}
+.waveform.speaking .wb{background:var(--amber2);animation:wvA .28s infinite ease-in-out}
+.wb:nth-child(1){animation-delay:0s}.wb:nth-child(2){animation-delay:.07s}
 .wb:nth-child(3){animation-delay:.14s}.wb:nth-child(4){animation-delay:.21s}
 .wb:nth-child(5){animation-delay:.14s}.wb:nth-child(6){animation-delay:.07s}
-.wb:nth-child(7){animation-delay:.00s}
+.wb:nth-child(7){animation-delay:0s}
 @keyframes wvA{0%,100%{height:3px}50%{height:23px}}
 
 .sd-stat{font-size:.58rem;letter-spacing:3px;color:var(--t2);
-  font-family:var(--font-title);min-height:16px;text-align:center;flex-shrink:0}
-.sd-stat.listening{color:var(--g);animation:badgeBlink .7s infinite}
-.sd-stat.speaking{color:var(--pu2)}
-.sd-stat.thinking{color:var(--a);animation:badgeBlink 1s infinite}
+  font-family:var(--title);min-height:16px;text-align:center;flex-shrink:0}
+.sd-stat.listening{color:var(--leaf);animation:blinkR .7s infinite}
+.sd-stat.speaking{color:var(--amber2)}
+.sd-stat.thinking{color:var(--amber);animation:blinkR 1s infinite}
 
-.sd-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;
-  gap:10px;padding:10px 0;min-height:0}
+/* Chat */
+.sd-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:10px 0;min-height:0}
 .sd-chat::-webkit-scrollbar{width:2px}
-.sd-chat::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25)}
+.sd-chat::-webkit-scrollbar-thumb{background:rgba(45,255,122,.15)}
 
-.msg{max-width:88%;display:flex;flex-direction:column;gap:3px;
-  animation:msgIn .35s ease both}
+.msg{max-width:90%;display:flex;flex-direction:column;gap:3px;animation:msgIn .35s ease both}
 @keyframes msgIn{from{opacity:0;transform:translateY(12px)}}
 .msg.u{align-self:flex-end}.msg.a{align-self:flex-start}
-.m-lbl{font-size:.5rem;letter-spacing:2px;opacity:.38;
-  font-family:var(--font-mono)}
-.msg.u .m-lbl{text-align:right;color:var(--c2)}
-.msg.a .m-lbl{color:var(--pu2)}
-.m-bub{padding:10px 14px;border-radius:3px;font-size:.82rem;
-  line-height:1.75;font-family:var(--font-body);font-weight:400}
-.msg.u .m-bub{background:rgba(0,255,247,.055);
-  border:1px solid rgba(0,255,247,.13);color:#d5f2f2;
-  border-radius:3px 3px 0 3px}
-.msg.a .m-bub{background:rgba(124,58,237,.08);
-  border:1px solid rgba(124,58,237,.2);color:#eae5ff;
-  border-radius:3px 3px 3px 0}
+.mlbl{font-size:.5rem;letter-spacing:2px;opacity:.35;font-family:var(--mono)}
+.msg.u .mlbl{text-align:right;color:var(--cyan2)}
+.msg.a .mlbl{color:var(--leaf)}
+.mbub{padding:11px 15px;border-radius:3px;font-size:.85rem;line-height:1.75;font-family:var(--prose);font-weight:400}
+.msg.u .mbub{background:rgba(0,255,247,.05);border:1px solid rgba(0,255,247,.12);
+  color:#cdf0ec;border-radius:3px 3px 0 3px}
+.msg.a .mbub{background:rgba(45,255,122,.05);border:1px solid rgba(45,255,122,.14);
+  color:#d8f5e4;border-radius:3px 3px 3px 0}
+/* Format markdown-like bold in AI responses */
+.mbub strong{color:var(--amber2);font-weight:700}
+.mbub em{color:var(--leaf);font-style:normal}
 .think-wrap{display:flex;gap:4px;padding:8px 0}
-.tdot{width:6px;height:6px;border-radius:50%;background:var(--pu2);
-  animation:tdB .55s infinite ease-in-out}
-.tdot:nth-child(2){animation-delay:.15s}
-.tdot:nth-child(3){animation-delay:.3s}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--leaf);animation:tdB .55s infinite ease-in-out}
+.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
 @keyframes tdB{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-.sd-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
-  padding:8px 0 4px;flex-shrink:0}
+/* Chips */
+.sd-chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:6px 0 4px;flex-shrink:0}
 .chip{font-size:.58rem;padding:6px 11px;border-radius:2px;
-  border:1px solid rgba(124,58,237,.22);color:rgba(167,139,250,.58);
-  cursor:pointer;transition:all .2s;font-family:var(--font-body);
-  letter-spacing:.5px;user-select:none;background:rgba(124,58,237,.02)}
-.chip:hover,.chip:active{border-color:var(--pu2);color:var(--pu2);
-  background:rgba(124,58,237,.08)}
+  border:1px solid rgba(45,255,122,.2);color:rgba(45,255,122,.55);
+  cursor:pointer;transition:all .2s;font-family:var(--body);letter-spacing:.5px;
+  user-select:none;background:rgba(45,255,122,.02)}
+.chip:hover,.chip:active{border-color:var(--leaf);color:var(--leaf);background:rgba(45,255,122,.06)}
+.chip.agri{border-color:rgba(212,160,23,.2);color:rgba(212,160,23,.55)}
+.chip.agri:hover,.chip.agri:active{border-color:var(--amber2);color:var(--amber2);background:rgba(212,160,23,.05)}
 
-.mic-area{display:flex;flex-direction:column;align-items:center;
-  gap:7px;padding:10px 0 0;flex-shrink:0}
-.mic-warn{font-size:.58rem;color:var(--a);text-align:center;
-  padding:7px 14px;border:1px solid rgba(255,170,0,.22);
-  border-radius:2px;background:rgba(255,170,0,.035);
-  line-height:1.65;display:none;max-width:400px}
-.mic-btn{width:64px;height:64px;border-radius:50%;
-  border:2px solid var(--pu2);cursor:pointer;
-  background:radial-gradient(circle at 40% 38%,#2b1868,#050115);
+/* Input row */
+.sd-input-row{display:flex;gap:8px;padding:8px 0 0;flex-shrink:0}
+.sd-input{flex:1;background:rgba(4,10,6,.9);border:1px solid var(--bo2);
+  border-radius:2px;padding:10px 12px;color:var(--t1);
+  font-family:var(--prose);font-size:.82rem;outline:none;
+  transition:border-color .25s;line-height:1.4;resize:none;height:42px}
+.sd-input:focus{border-color:var(--leaf);box-shadow:0 0 8px rgba(45,255,122,.12)}
+.sd-input::placeholder{color:var(--t3);opacity:.7}
+.sd-send{background:rgba(45,255,122,.08);border:1px solid rgba(45,255,122,.3);
+  color:var(--leaf);width:42px;height:42px;border-radius:2px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px rgba(124,58,237,.38);
-  transition:all .3s;-webkit-tap-highlight-color:transparent;
-  outline:none}
-.mic-btn:active{transform:scale(.9);box-shadow:0 0 10px rgba(124,58,237,.2)}
-.mic-btn.rec{border-color:var(--r);
-  background:radial-gradient(circle,#400c1e,#10020a);
-  box-shadow:0 0 30px rgba(255,51,102,.5);
-  animation:micPulse .55s infinite}
-@keyframes micPulse{50%{transform:scale(1.09)}}
-.mic-btn svg{width:26px;height:26px}
-.mic-hint{font-size:.56rem;color:var(--t2);letter-spacing:2px;
-  opacity:.5;text-align:center;min-height:14px}
+  transition:all .25s;flex-shrink:0}
+.sd-send:hover{background:rgba(45,255,122,.15);border-color:var(--leaf)}
+.sd-send:active{transform:scale(.9)}
+.sd-send svg{width:18px;height:18px}
 
-/* ═══════════ NOTIFICATIONS ═══════════ */
-.notif{position:fixed;top:20px;left:50%;transform:translateX(-50%);
-  z-index:9000;font-size:.7rem;letter-spacing:1.5px;
-  padding:10px 20px;border-radius:3px;white-space:nowrap;
-  font-family:var(--font-mono);animation:notifIn .3s ease;
-  transition:opacity .5s}
-.notif.ok{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);
-  color:var(--g);box-shadow:0 0 20px rgba(0,255,136,.15)}
-.notif.err{background:rgba(255,51,102,.1);border:1px solid rgba(255,51,102,.3);
-  color:var(--r);box-shadow:0 0 20px rgba(255,51,102,.15)}
-@keyframes notifIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+/* Mic */
+.mic-area{display:flex;flex-direction:column;align-items:center;gap:7px;padding:6px 0 0;flex-shrink:0}
+.mic-warn{font-size:.57rem;color:var(--amber2);text-align:center;
+  padding:7px 14px;border:1px solid rgba(212,160,23,.2);border-radius:2px;
+  background:rgba(212,160,23,.03);line-height:1.65;display:none;max-width:420px}
+.mic-btn{width:62px;height:62px;border-radius:50%;border:2px solid var(--leaf);cursor:pointer;
+  background:radial-gradient(circle at 40% 38%,#1a3c0e,#030803);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 18px rgba(45,255,122,.3);transition:all .3s;outline:none}
+.mic-btn:active{transform:scale(.9)}
+.mic-btn.rec{border-color:var(--r);background:radial-gradient(circle,#3d0b0e,#0d0204);
+  box-shadow:0 0 28px rgba(255,51,85,.5);animation:mRec .55s infinite}
+@keyframes mRec{50%{transform:scale(1.09)}}
+.mic-btn svg{width:26px;height:26px}
+.mic-hint{font-size:.55rem;color:var(--t2);letter-spacing:2px;opacity:.45;text-align:center}
+
+/* Mode toggle in chat header */
+.chat-modes{display:flex;gap:6px;flex-shrink:0;padding:4px 0}
+.cmode-btn{font-size:.58rem;padding:5px 12px;border-radius:2px;cursor:pointer;
+  transition:all .2s;font-family:var(--mono);letter-spacing:1px;user-select:none}
+.cmode-btn.active-sensor{background:rgba(0,255,247,.08);border:1px solid rgba(0,255,247,.3);color:var(--cyan2)}
+.cmode-btn.active-agri{background:rgba(45,255,122,.08);border:1px solid rgba(45,255,122,.3);color:var(--leaf)}
+.cmode-btn.inactive{background:rgba(14,46,20,.4);border:1px solid var(--bo);color:var(--t3)}
+
+/* Notification */
+.notif{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9000;
+  font-size:.68rem;letter-spacing:1.5px;padding:10px 20px;border-radius:3px;
+  white-space:nowrap;font-family:var(--mono);animation:nIn .3s ease;transition:opacity .5s}
+.notif.ok{background:rgba(45,255,122,.08);border:1px solid rgba(45,255,122,.28);
+  color:var(--leaf);box-shadow:0 0 18px rgba(45,255,122,.12)}
+.notif.err{background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.28);
+  color:var(--r);box-shadow:0 0 18px rgba(255,51,85,.12)}
+@keyframes nIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 </style>
 </head>
 <body>
 
-<!-- Background layers -->
-<div class="bg-layer" id="bggrid"></div>
-<div class="bg-layer" id="bgaura"></div>
-<div class="bg-layer" id="bgscan"></div>
-<div class="bg-layer" id="bgparticles"></div>
+<div class="bgl" id="bgGrid"></div>
+<div class="bgl" id="bgAura"></div>
+<div class="bgl" id="bgScan"></div>
+<div class="bgl" id="bgParticles"></div>
 <div id="connBar"></div>
 
-<!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
+<!-- ═══════════════ LOADING ═══════════════ -->
 <div id="load">
-  <div class="load-orbit">
-    <div class="load-ring lr1"></div>
-    <div class="load-ring lr2"></div>
-    <div class="load-ring lr3"></div>
-    <div class="load-ring lr4"></div>
-    <div class="load-core">
-      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="40" cy="40" r="34" fill="rgba(124,58,237,.1)" stroke="rgba(124,58,237,.4)" stroke-width="1.5"/>
-        <circle cx="40" cy="30" r="12" fill="rgba(167,139,250,.16)" stroke="#a78bfa" stroke-width="1.5"/>
-        <path d="M19 65c0-11.5 9.4-19.5 21-19.5S61 53.5 61 65" stroke="#a78bfa" stroke-width="1.5" fill="rgba(124,58,237,.1)"/>
-        <circle cx="35.5" cy="28.5" r="2" fill="#a78bfa"/>
-        <circle cx="44.5" cy="28.5" r="2" fill="#a78bfa"/>
-        <path d="M35 35 q5 3.5 10 0" stroke="#a78bfa" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <circle cx="12" cy="40" r="2.5" fill="rgba(0,255,247,.5)" stroke="#00fff7" stroke-width="1"/>
-        <circle cx="68" cy="40" r="2.5" fill="rgba(0,255,247,.5)" stroke="#00fff7" stroke-width="1"/>
-        <line x1="14.5" y1="40" x2="26" y2="40" stroke="rgba(0,255,247,.28)" stroke-width="1" stroke-dasharray="2,2"/>
-        <line x1="54" y1="40" x2="65.5" y2="40" stroke="rgba(0,255,247,.28)" stroke-width="1" stroke-dasharray="2,2"/>
-        <path d="M27 54 q13 9 26 0" stroke="rgba(0,255,247,.25)" stroke-width="1" fill="none" stroke-dasharray="2.5,2.5"/>
-      </svg>
-    </div>
+  <div class="ls-orbit">
+    <div class="ls-r ls-r1"></div><div class="ls-r ls-r2"></div>
+    <div class="ls-r ls-r3"></div><div class="ls-r ls-r4"></div>
+    <div class="ls-core">🌿</div>
   </div>
-  <div class="load-title">Sprayday Assistance</div>
-  <div class="load-sub">INTELLIGENT IRRIGATION SYSTEM</div>
-  <div class="load-track"><div class="load-fill"></div></div>
-  <div class="load-msg" id="loadMsg">INITIALIZING...</div>
+  <div class="ls-title">Sprayday Assistance</div>
+  <div class="ls-tag">AI-POWERED AGRICULTURAL SYSTEM</div>
+  <div class="ls-track"><div class="ls-fill"></div></div>
+  <div class="ls-msg" id="lsMsg">INITIALIZING...</div>
 </div>
 
-<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
-
   <div class="hdr">
-    <div class="logo">SPRAYDAY&#8209;V1</div>
-    <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; CLOUD IRRIGATION SYSTEM</div>
+    <div class="logo">HYDRA&#8209;32</div>
+    <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
-      <div class="live-ind">
-        <span class="live-dot"></span>
-        <span id="liveLabel">CONNECTING...</span>
-      </div>
+      <div class="live-pill"><span class="live-dot"></span><span id="liveLabel">CONNECTING...</span></div>
       <span id="modePill" class="mode-pill">&#9670; AUTO MODE</span>
     </div>
   </div>
 
-  <!-- Connection info -->
-  <div class="conn-card" id="connCard">
-    <div class="conn-item">
-      <span class="conn-k">DEVICE ID</span>
-      <span class="conn-v" id="dispDevId">—</span>
-    </div>
-    <div class="conn-item">
-      <span class="conn-k">MQTT STATUS</span>
-      <span class="conn-v" id="dispMqtt">Connecting...</span>
-    </div>
-    <div class="conn-item">
-      <span class="conn-k">LAST UPDATE</span>
-      <span class="conn-v" id="dispSync">—</span>
-    </div>
-    <div class="conn-dot wait" id="connDot"></div>
+  <div class="conn-card">
+    <div><div class="ck">DEVICE ID</div><div class="cv" id="dispId">—</div></div>
+    <div><div class="ck">MQTT</div><div class="cv" id="dispMqtt">Connecting...</div></div>
+    <div><div class="ck">LAST SYNC</div><div class="cv" id="dispSync">—</div></div>
+    <div class="cdot wait" id="connDot"></div>
   </div>
 
-  <!-- Row 1: Gauge + Pump -->
   <div class="g2">
     <div class="pnl">
-      <div class="plbl"><span class="plbl-dot"></span>Soil Moisture</div>
+      <div class="plbl">Soil Moisture</div>
       <div class="gauge-wrap">
-        <svg class="gauge-svg" viewBox="0 0 152 152" style="filter:drop-shadow(0 0 7px rgba(0,255,247,.22))">
-          <circle cx="76" cy="76" r="64" fill="none" stroke="#0a2535" stroke-width="8.5"/>
-          <circle id="gArc" cx="76" cy="76" r="64" fill="none" stroke="#00fff7" stroke-width="8.5"
+        <svg class="gauge-svg" viewBox="0 0 154 154" style="filter:drop-shadow(0 0 7px rgba(45,255,122,.2))">
+          <circle cx="77" cy="77" r="64" fill="none" stroke="#0e2e14" stroke-width="8.5"/>
+          <circle id="gArc" cx="77" cy="77" r="64" fill="none" stroke="#2dff7a" stroke-width="8.5"
             stroke-dasharray="335" stroke-dashoffset="335" stroke-linecap="round"
-            transform="rotate(-210 76 76)"
-            style="transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke .4s;
-            filter:drop-shadow(0 0 5px #00fff7)"/>
-          <circle cx="76" cy="76" r="52" fill="#020b12" stroke="#051828" stroke-width="1"/>
-          <text x="76" y="72" text-anchor="middle" fill="#fff"
+            transform="rotate(-210 77 77)"
+            style="transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke .4s;filter:drop-shadow(0 0 5px #2dff7a)"/>
+          <circle cx="77" cy="77" r="52" fill="#020c05" stroke="#051809" stroke-width="1"/>
+          <text x="77" y="73" text-anchor="middle" fill="#fff"
             font-family="Orbitron,monospace" font-size="24" font-weight="900" id="gNum">--</text>
-          <text x="76" y="89" text-anchor="middle" fill="#00c8c2"
+          <text x="77" y="90" text-anchor="middle" fill="#6fa882"
             font-family="Share Tech Mono,monospace" font-size="11" letter-spacing="2.5">PERCENT</text>
-          <g stroke="#0a2535" stroke-width="1.5" opacity=".6">
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(-150 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(-120 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(-90 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(-60 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(-30 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(0 76 76)"/>
-            <line x1="76" y1="14" x2="76" y2="22" transform="rotate(30 76 76)"/>
+          <g stroke="#0e2e14" stroke-width="1.5" opacity=".6">
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(-150 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(-120 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(-90 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(-60 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(-30 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(0 77 77)"/>
+            <line x1="77" y1="14" x2="77" y2="22" transform="rotate(30 77 77)"/>
           </g>
         </svg>
-        <div id="gBadge" class="gauge-badge">READING...</div>
-        <div class="thresh-row">
-          <div class="tc tc-d">DRY &lt;30%</div>
-          <div class="tc tc-w">WET &gt;70%</div>
-        </div>
+        <div id="gBadge" class="gbadge">READING...</div>
+        <div class="tc-row"><div class="tc tc-d">DRY &lt;30%</div><div class="tc tc-w">WET &gt;70%</div></div>
       </div>
     </div>
-
     <div class="pnl">
-      <div class="plbl"><span class="plbl-dot"></span>Water Pump</div>
-      <div class="pump-center">
-        <div id="pOrb" class="pump-orb">
-          <div class="pump-inner" id="pIcon">&#128268;</div>
-        </div>
+      <div class="plbl">Water Pump</div>
+      <div class="pump-c">
+        <div id="pOrb" class="pump-orb"><div class="pump-inner" id="pIcon">🔌</div></div>
         <div id="pState" class="pump-state">STANDBY</div>
         <div id="pSub" class="pump-sub">OFFLINE</div>
       </div>
       <div class="spec-list">
         <div class="spec-row"><span class="sk">GPIO</span><span class="sv">PIN 25</span></div>
-        <div class="spec-row"><span class="sk">RELAY TYPE</span><span class="sv">ACTIVE-LOW</span></div>
-        <div class="spec-row"><span class="sk">SENSOR GPIO</span><span class="sv">PIN 34</span></div>
+        <div class="spec-row"><span class="sk">RELAY</span><span class="sv">ACTIVE-LOW</span></div>
+        <div class="spec-row"><span class="sk">SENSOR</span><span class="sv">GPIO 34</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Analytics -->
   <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl"><span class="plbl-dot"></span>Sensor Analytics</div>
-    <div class="dbar">
-      <span class="db-l">MOISTURE</span>
-      <div class="db-t"><div id="bM" class="db-f fc" style="width:0%"></div></div>
-      <span id="vM" class="db-v">--%</span>
-    </div>
-    <div class="dbar">
-      <span class="db-l">DRY LIMIT</span>
-      <div class="db-t"><div class="db-f fr" style="width:30%"></div></div>
-      <span class="db-v" style="color:var(--r)">30%</span>
-    </div>
-    <div class="dbar">
-      <span class="db-l">WET LIMIT</span>
-      <div class="db-t"><div class="db-f fg" style="width:70%"></div></div>
-      <span class="db-v" style="color:var(--g)">70%</span>
-    </div>
+    <div class="plbl">Sensor Analytics</div>
+    <div class="dbar"><span class="dbl">MOISTURE</span><div class="dbt"><div id="bM" class="dbf fg" style="width:0%"></div></div><span id="vM" class="dbv">--%</span></div>
+    <div class="dbar"><span class="dbl">DRY LIMIT</span><div class="dbt"><div class="dbf fr" style="width:30%"></div></div><span class="dbv" style="color:var(--r)">30%</span></div>
+    <div class="dbar"><span class="dbl">WET LIMIT</span><div class="dbt"><div class="dbf fg" style="width:70%"></div></div><span class="dbv" style="color:var(--leaf)">70%</span></div>
   </div>
 
-  <!-- Quick Actions -->
   <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl"><span class="plbl-dot"></span>Quick Actions</div>
+    <div class="plbl">Quick Actions</div>
     <div class="qa-grid">
-      <div class="qbtn q-on" onclick="sendCmd('pump_on')">
-        <span class="qi">&#128166;</span>
-        <span class="ql">ACTIVATE PUMP</span>
-      </div>
-      <div class="qbtn q-off" onclick="sendCmd('pump_off')">
-        <span class="qi">&#128268;</span>
-        <span class="ql">DEACTIVATE PUMP</span>
-      </div>
-      <div class="qbtn q-data" onclick="qData()">
-        <span class="qi">&#128202;</span>
-        <span class="ql">VIEW DATA</span>
-      </div>
-      <div class="qbtn q-ai" onclick="openSD()">
-        <span class="qi">&#127908;</span>
-        <span class="ql">VOICE AI</span>
-      </div>
+      <div class="qbtn q-on" onclick="sendCmd('pump_on')"><span class="qi">💧</span><span class="ql">ACTIVATE PUMP</span></div>
+      <div class="qbtn q-off" onclick="sendCmd('pump_off')"><span class="qi">🔌</span><span class="ql">DEACTIVATE PUMP</span></div>
+      <div class="qbtn q-data" onclick="qData()"><span class="qi">📊</span><span class="ql">VIEW DATA</span></div>
+      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY AI</span></div>
     </div>
   </div>
 
-  <!-- Control Panel -->
   <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl"><span class="plbl-dot"></span>Control Panel</div>
+    <div class="plbl">Control Panel</div>
     <div class="ctrl-row">
       <div><div class="ct">MANUAL MODE</div><div class="cs" id="manSub">AUTO LOGIC ACTIVE</div></div>
       <label class="sw"><input type="checkbox" id="manToggle" onchange="doManual()"><span class="sl"></span></label>
@@ -599,59 +496,40 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     </div>
   </div>
 
-  <!-- System Log -->
   <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl"><span class="plbl-dot"></span>System Log</div>
+    <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-
-  <div class="app-footer">
-    HYDRA-32 &nbsp;&#47;&#47;&nbsp; SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp;
-    BROKER: broker.hivemq.com &nbsp;&#47;&#47;&nbsp;
-    <span id="footerSync">NOT CONNECTED</span>
-  </div>
+  <div class="app-footer">SPRAYDAY ASSISTANCE // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
 </div>
 
-<!-- ═══════════════════ FAB ═══════════════════ -->
+<!-- FAB -->
 <div id="fab" onclick="openSD()">
-  <div class="fab-ring">
+  <div class="fab-orb">
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="11" stroke="#a78bfa" stroke-width="1.5"/>
-      <circle cx="14" cy="14" r="5.5" fill="rgba(124,58,237,.2)" stroke="#a78bfa" stroke-width="1"/>
-      <circle cx="14" cy="14" r="2" fill="#a78bfa"/>
-      <path d="M14 3.5v3M14 21.5v3M3.5 14h3M21.5 14h3" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="14" cy="14" r="11" stroke="#2dff7a" stroke-width="1.5"/>
+      <path d="M14 8v3M14 17v3M8 14h3M17 14h3" stroke="#2dff7a" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="14" cy="14" r="3" fill="rgba(45,255,122,.3)" stroke="#2dff7a" stroke-width="1"/>
     </svg>
   </div>
-  <div class="fab-label">SPRAYDAY<br>VOICE AI</div>
+  <div class="fab-lbl">SPRAYDAY<br>AI</div>
 </div>
 
-<!-- ═══════════════════ SPRAYDAY MODAL ═══════════════════ -->
+<!-- ═══════════════ SPRAYDAY MODAL ═══════════════ -->
 <div id="sdModal">
   <div class="sd-shell">
     <div class="sd-top">
-      <div class="sd-wordmark">&#9670; SPRAYDAY ASSISTANCE</div>
+      <div class="sd-brand">
+        <div class="sd-wordmark">&#9670; SPRAYDAY AI</div>
+        <div class="sd-tagline">AGRICULTURAL INTELLIGENCE ASSISTANT</div>
+      </div>
       <button class="sd-close" onclick="closeSD()">&#10005;</button>
     </div>
 
-    <div class="av-wrap">
+    <div class="av-section">
       <div class="av-rings">
-        <div class="av-r av-r1"></div>
-        <div class="av-r av-r2"></div>
-        <div class="av-r av-r3"></div>
-        <div class="av-core">
-          <svg class="av-svg" viewBox="0 0 80 80" fill="none">
-            <circle cx="40" cy="40" r="34" fill="rgba(124,58,237,.12)" stroke="rgba(124,58,237,.35)" stroke-width="1.5"/>
-            <circle cx="40" cy="30" r="12" fill="rgba(167,139,250,.16)" stroke="#a78bfa" stroke-width="1.5"/>
-            <path d="M19 65c0-11.5 9.4-19.5 21-19.5S61 53.5 61 65" stroke="#a78bfa" stroke-width="1.5" fill="rgba(124,58,237,.1)"/>
-            <circle cx="35.5" cy="28.5" r="2" fill="#a78bfa"/>
-            <circle cx="44.5" cy="28.5" r="2" fill="#a78bfa"/>
-            <path d="M35 35 q5 3.5 10 0" stroke="#a78bfa" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <circle cx="12" cy="40" r="2" fill="rgba(0,255,247,.5)" stroke="#00fff7"/>
-            <circle cx="68" cy="40" r="2" fill="rgba(0,255,247,.5)" stroke="#00fff7"/>
-            <line x1="14" y1="40" x2="26" y2="40" stroke="rgba(0,255,247,.28)" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="54" y1="40" x2="66" y2="40" stroke="rgba(0,255,247,.28)" stroke-width="1" stroke-dasharray="2,2"/>
-          </svg>
-        </div>
+        <div class="av-r av-r1"></div><div class="av-r av-r2"></div><div class="av-r av-r3"></div>
+        <div class="av-core">🌿</div>
       </div>
     </div>
 
@@ -660,27 +538,36 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
       <div class="wb"></div><div class="wb"></div><div class="wb"></div>
       <div class="wb"></div>
     </div>
-    <div class="sd-stat" id="sdStat">TALK TO SPRAYDAY ASSISTANCE</div>
+    <div class="sd-stat" id="sdStat">READY TO ASSIST</div>
+
+    <!-- Mode selector -->
+    <div class="chat-modes">
+      <button class="cmode-btn active-sensor" id="btnSensor" onclick="setMode('sensor')">📊 Sensor Control</button>
+      <button class="cmode-btn inactive" id="btnAgri" onclick="setMode('agri')">🌾 Agriculture AI</button>
+    </div>
 
     <div class="sd-chat" id="sdChat"></div>
 
-    <div class="sd-chips">
-      <div class="chip" onclick="runCmd('pump_on')">Activate Pump</div>
-      <div class="chip" onclick="runCmd('pump_off')">Deactivate Pump</div>
-      <div class="chip" onclick="runCmd('show current monitoring data')">Monitoring Data</div>
-      <div class="chip" onclick="runCmd('analyze and advise')">Analyze &amp; Advise</div>
-      <div class="chip" onclick="runCmd('switch to auto mode')">Auto Mode</div>
-      <div class="chip" onclick="runCmd('switch to manual mode')">Manual Mode</div>
+    <!-- Quick chips change per mode -->
+    <div class="sd-chips" id="sdChips"></div>
+
+    <!-- Text input row -->
+    <div class="sd-input-row">
+      <textarea class="sd-input" id="sdInput" placeholder="Type your question... (e.g. How do I grow coffee?)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText()}"></textarea>
+      <button class="sd-send" onclick="sendText()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#2dff7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22 11 13 2 9l20-7z" stroke="#2dff7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
 
     <div class="mic-area">
       <div class="mic-warn" id="micWarn"></div>
-      <button class="mic-btn" id="micBtn" onclick="toggleMic()" aria-label="Tap to speak">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()">
         <svg viewBox="0 0 24 24" fill="none">
-          <rect x="9" y="2" width="6" height="12" rx="3" fill="#a78bfa"/>
-          <path d="M5 10a7 7 0 0014 0" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="12" y1="17" x2="12" y2="21" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="9" y1="21" x2="15" y2="21" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="#2dff7a"/>
+          <path d="M5 10a7 7 0 0014 0" stroke="#2dff7a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="17" x2="12" y2="21" stroke="#2dff7a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="21" x2="15" y2="21" stroke="#2dff7a" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </button>
       <div class="mic-hint" id="micHint">TAP TO SPEAK</div>
@@ -689,226 +576,271 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════
-//  CONFIG — Set device ID from URL param or default
-// ══════════════════════════════════════════════════════
-const urlParams = new URLSearchParams(window.location.search);
-const DEVICE_ID = urlParams.get('id') || 'sprayday001';
+// ════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════
+const urlP = new URLSearchParams(window.location.search);
+const DEVICE_ID = urlP.get('id') || 'sprayday001';
 const BROKER    = 'broker.hivemq.com';
-const WS_PORT   = 8884;  // WebSocket SSL port (works on HTTPS pages)
-const TOPIC_SENSOR  = `sprayday/${DEVICE_ID}/sensor`;
-const TOPIC_STATUS  = `sprayday/${DEVICE_ID}/status`;
-const TOPIC_COMMAND = `sprayday/${DEVICE_ID}/command`;
+const WS_PORT   = 8884;
+const T_SENSOR  = `sprayday/${DEVICE_ID}/sensor`;
+const T_STATUS  = `sprayday/${DEVICE_ID}/status`;
+const T_CMD     = `sprayday/${DEVICE_ID}/command`;
 
-document.getElementById('dispDevId').textContent = DEVICE_ID;
+document.getElementById('dispId').textContent = DEVICE_ID;
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
 //  STATE
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
 let moisture=0, pump=false, manual=false;
 let mqttClient=null, mqttOk=false;
 let isRec=false, recog=null, talking=false, sdOpened=false;
-let logArr=[];
+let logArr=[], chatMode='sensor';
+let convHistory=[]; // For Claude API context
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
 //  PARTICLES
-// ══════════════════════════════════════════════════════
-(function spawnParticles(){
-  const c=document.getElementById('bgparticles');
-  for(let i=0;i<18;i++){
-    const p=document.createElement('div');
-    p.className='particle';
+// ════════════════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('bgParticles');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='ptcl';
+    const colors=['rgba(45,255,122,.35)','rgba(0,180,74,.25)','rgba(212,160,23,.2)','rgba(0,255,247,.2)'];
     p.style.cssText=`left:${Math.random()*100}%;`+
-      `animation-duration:${8+Math.random()*14}s;`+
-      `animation-delay:${-Math.random()*14}s;`+
-      `width:${Math.random()<.5?1:2}px;height:${Math.random()<.5?1:2}px;`+
-      `opacity:${.2+Math.random()*.4}`;
+      `animation-duration:${9+Math.random()*16}s;`+
+      `animation-delay:${-Math.random()*16}s;`+
+      `width:${Math.random()<.6?1:2}px;height:${Math.random()<.6?1:2}px;`+
+      `background:${colors[Math.floor(Math.random()*colors.length)]};`+
+      `opacity:${.15+Math.random()*.35}`;
     c.appendChild(p);
   }
 })();
 
-// ══════════════════════════════════════════════════════
-//  LOADING SEQUENCE
-// ══════════════════════════════════════════════════════
-const lMsgs=['INITIALIZING...','LOADING SENSOR DRIVERS...','CONNECTING TO MQTT CLOUD...','LOADING VOICE ENGINE...','ESTABLISHING DATA LINK...','SYSTEM ONLINE'];
+// ════════════════════════════════════════════════════
+//  LOADING
+// ════════════════════════════════════════════════════
+const lMsgs=['INITIALIZING...','LOADING CROP DATABASE...','CONNECTING TO MQTT CLOUD...','LOADING AI ENGINE...','CALIBRATING SENSORS...','SYSTEM ONLINE'];
 let lIdx=0;
-const lTimer=setInterval(()=>{
-  if(++lIdx<lMsgs.length) document.getElementById('loadMsg').textContent=lMsgs[lIdx];
-  else clearInterval(lTimer);
-},420);
-
+const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMsg').textContent=lMsgs[lIdx];else clearInterval(lTmr);},420);
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('HYDRA-32 + Sprayday v5.0 loaded','lo');
-    sysLog(`Device ID: ${DEVICE_ID}`,'ll');
+    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
+    sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
+    renderChips();
   },2800);
 });
 
-// ══════════════════════════════════════════════════════
-//  MQTT — WebSocket over SSL (works from HTTPS pages on any device)
-// ══════════════════════════════════════════════════════
-function initMQTT(){
-  if(typeof Paho === 'undefined'){
-    sysLog('MQTT library not loaded — check CDN','le');
-    setConnStatus(false,'Library error');
-    return;
-  }
-  const clientId='dashboard-'+DEVICE_ID+'-'+Math.random().toString(16).slice(2,8);
-  mqttClient = new Paho.MQTT.Client(BROKER, WS_PORT, '/mqtt', clientId);
+// ════════════════════════════════════════════════════
+//  MODE CHIPS
+// ════════════════════════════════════════════════════
+const CHIPS = {
+  sensor:[
+    {l:'Activate Pump',a:()=>sendCmd('pump_on')},
+    {l:'Deactivate Pump',a:()=>sendCmd('pump_off')},
+    {l:'Monitoring Data',a:()=>runCmd('show current sensor data')},
+    {l:'Analyze & Advise',a:()=>runCmd('analyze soil and advise')},
+    {l:'Auto Mode',a:()=>sendCmd('auto_mode')},
+    {l:'Manual Mode',a:()=>sendCmd('manual_mode')},
+  ],
+  agri:[
+    {l:'🌾 Grow Rice',a:()=>runCmd('How do I start a rice farm? What are the steps and what should I prepare?'),cls:'agri'},
+    {l:'☕ Grow Coffee',a:()=>runCmd('I want to start a coffee plantation. What do I need to prepare and how to plant correctly?'),cls:'agri'},
+    {l:'🌶 Grow Chili',a:()=>runCmd('How to grow chili peppers on a large scale? Best practices and common problems?'),cls:'agri'},
+    {l:'🧅 Grow Onion',a:()=>runCmd('Guide me on growing onions. Soil preparation, planting, and fertilization.'),cls:'agri'},
+    {l:'💊 Fertilizer Guide',a:()=>runCmd('What fertilizers should I use and when? Explain organic and chemical options.'),cls:'agri'},
+    {l:'🐛 Pest Control',a:()=>runCmd('What are the most common pests and diseases in large-scale farming and how to handle them?'),cls:'agri'},
+    {l:'💧 Irrigation Tips',a:()=>runCmd('Best irrigation practices for large scale farming. When and how much to water?'),cls:'agri'},
+    {l:'📅 Planting Calendar',a:()=>runCmd('Create a planting and fertilization schedule for tropical farming.'),cls:'agri'},
+  ]
+};
 
-  mqttClient.onConnectionLost = (res) => {
-    mqttOk=false;
-    setConnStatus(false,'Reconnecting...');
-    sysLog('MQTT connection lost: '+res.errorMessage,'le');
-    setTimeout(connectMQTT, 3000);
-  };
-
-  mqttClient.onMessageArrived = (msg) => {
-    try{
-      const d=JSON.parse(msg.payloadString);
-      if(msg.destinationName===TOPIC_SENSOR || msg.destinationName===TOPIC_STATUS){
-        updateFromData(d);
-      }
-    }catch(e){}
-  };
-
-  connectMQTT();
-}
-
-function connectMQTT(){
-  if(!mqttClient) return;
-  document.getElementById('dispMqtt').textContent='Connecting...';
-  mqttClient.connect({
-    useSSL: true,
-    timeout: 10,
-    keepAliveInterval: 30,
-    cleanSession: true,
-    onSuccess: () => {
-      mqttOk=true;
-      setConnStatus(true,'Connected');
-      sysLog('MQTT connected to broker.hivemq.com','lo');
-      mqttClient.subscribe(TOPIC_SENSOR);
-      mqttClient.subscribe(TOPIC_STATUS);
-      sysLog(`Subscribed to ${DEVICE_ID} topics`,'ll');
-      // Request fresh data
-      publishCmd('ping');
-    },
-    onFailure: (e) => {
-      mqttOk=false;
-      setConnStatus(false,'Failed: '+e.errorMessage);
-      sysLog('MQTT connect failed: '+e.errorMessage,'le');
-      setTimeout(connectMQTT, 5000);
-    }
+function renderChips(){
+  const c=document.getElementById('sdChips');
+  c.innerHTML='';
+  CHIPS[chatMode].forEach(ch=>{
+    const d=document.createElement('div');
+    d.className='chip'+(ch.cls?' '+ch.cls:'');
+    d.textContent=ch.l;
+    d.onclick=ch.a;
+    c.appendChild(d);
   });
 }
 
-function setConnStatus(ok, msg){
-  const dot=document.getElementById('connDot');
-  const lbl=document.getElementById('dispMqtt');
-  const bar=document.getElementById('connBar');
-  const live=document.getElementById('liveLabel');
-  dot.className='conn-dot '+(ok?'ok':'err');
-  lbl.textContent=msg;
-  bar.className=ok?'ok':'err';
-  live.textContent=ok?'LIVE — MQTT CLOUD':'CONNECTION LOST';
+function setMode(m){
+  chatMode=m;
+  document.getElementById('btnSensor').className='cmode-btn '+(m==='sensor'?'active-sensor':'inactive');
+  document.getElementById('btnAgri').className='cmode-btn '+(m==='agri'?'active-agri':'inactive');
+  document.getElementById('sdInput').placeholder=m==='sensor'?
+    'Control sensor & pump... (e.g. turn on pump)':
+    'Ask anything about farming... (e.g. How do I grow coffee on 1 hectare?)';
+  renderChips();
 }
 
-function publishCmd(cmd){
-  if(!mqttClient||!mqttOk) return;
-  const msg=new Paho.MQTT.Message(JSON.stringify({cmd}));
-  msg.destinationName=TOPIC_COMMAND;
-  msg.qos=0;
-  mqttClient.send(msg);
+// ════════════════════════════════════════════════════
+//  CLAUDE AI API CALL
+// ════════════════════════════════════════════════════
+async function callClaudeAI(userMessage, systemPrompt){
+  // Add to conversation history for context
+  convHistory.push({role:'user',content:userMessage});
+  if(convHistory.length>12) convHistory=convHistory.slice(-12); // Keep last 6 turns
+
+  try{
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages: convHistory
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
+    // Add assistant response to history
+    convHistory.push({role:'assistant',content:text});
+    if(convHistory.length>12) convHistory=convHistory.slice(-12);
+    return text;
+  }catch(e){
+    return `I encountered an error connecting to the AI service. Please check your connection and try again.`;
+  }
 }
 
-// ══════════════════════════════════════════════════════
-//  DATA UPDATE FROM MQTT
-// ══════════════════════════════════════════════════════
-function updateFromData(d){
-  const prevPump=pump, prevMan=manual;
-  if(d.moisture!==undefined) moisture=d.moisture;
-  if(d.pump!==undefined)     pump=d.pump;
-  if(d.manual!==undefined)   manual=d.manual;
+const AGRI_SYSTEM = `You are Sprayday, an expert AI agricultural assistant focused on helping farmers — both beginners and advanced — achieve excellent, export-quality results.
 
-  updateGauge(moisture);
-  updatePumpUI(pump);
+Your expertise covers:
+- Rice, coffee, chili, onion, corn, palm oil, cocoa, rubber, vegetables, fruits, and all major tropical crops
+- Soil preparation, seed selection, planting techniques, spacing, irrigation schedules
+- Fertilizer types (NPK, organic, urea, TSP, KCl), dosage, timing, and application methods
+- Pest and disease identification, prevention, and treatment (organic and chemical)
+- Harvest timing, post-harvest handling, grading, and export standards
+- Large-scale farm management, labor efficiency, cost optimization
+- Climate and weather considerations for tropical farming
+- Modern agricultural technology (sensors, irrigation systems, drones)
+- Organic and sustainable farming practices
 
-  const mp=document.getElementById('modePill');
-  mp.textContent=manual?'◆ MANUAL MODE':'◆ AUTO MODE';
-  mp.className='mode-pill'+(manual?' man':'');
+IMPORTANT RULES:
+- Always give practical, actionable advice with specific numbers (amounts, timing, spacing)
+- Understand questions even when phrased informally or without technical terms
+- Adapt advice to scale (backyard garden to commercial plantation)
+- When asked about irrigation or soil moisture, connect to the HYDRA-32 sensor data if relevant
+- Always respond in English regardless of input language
+- Format responses clearly with bold headers when listing steps
+- Be encouraging and supportive — many users are beginners
+- Current sensor data: MOISTURE_PLACEHOLDER% soil moisture, pump is PUMP_PLACEHOLDER`;
 
-  document.getElementById('manToggle').checked=manual;
-  document.getElementById('pToggle').checked=pump;
-  document.getElementById('pToggle').disabled=!manual;
-  document.getElementById('manSub').textContent=manual?'MANUAL OVERRIDE ACTIVE':'AUTO LOGIC ACTIVE';
+const SENSOR_SYSTEM = `You are Sprayday, an intelligent irrigation control assistant for the HYDRA-32 ESP32 system.
 
-  const now=new Date().toLocaleTimeString('en-US',{hour12:false});
-  document.getElementById('dispSync').textContent=now;
-  document.getElementById('footerSync').textContent='LAST SYNC '+now;
+Current sensor data:
+- Soil moisture: MOISTURE_PLACEHOLDER%
+- Water pump: PUMP_PLACEHOLDER
+- System mode: MODE_PLACEHOLDER
+- Dry threshold: 30% (pump activates below this)
+- Wet threshold: 70% (pump deactivates above this)
 
-  if(prevPump!==pump) sysLog('Pump: '+(pump?'ACTIVE':'OFFLINE'),pump?'lo':'lw');
-  if(prevMan!==manual) sysLog('Mode: '+(manual?'MANUAL':'AUTO'),manual?'lw':'lo');
+You help users:
+- Control the water pump (on/off)
+- Understand sensor readings
+- Switch between auto and manual mode
+- Analyze soil conditions
+- Provide irrigation recommendations based on current data
+
+Be concise, direct, and helpful. Respond in the same language as the user.`;
+
+function getSensorContext(sys){
+  return sys
+    .replace('MOISTURE_PLACEHOLDER', moisture)
+    .replace('PUMP_PLACEHOLDER', pump ? 'ACTIVE (running)' : 'OFFLINE (stopped)')
+    .replace('MODE_PLACEHOLDER', manual ? 'MANUAL override' : 'AUTO control');
 }
 
-// ══════════════════════════════════════════════════════
-//  COMMANDS (sends via MQTT to ESP32)
-// ══════════════════════════════════════════════════════
-function sendCmd(cmd){
-  if(!mqttOk){showNotif('Not connected to ESP32','err');return;}
-  publishCmd(cmd);
-  const msgs={
-    'pump_on':'Activating pump...',
-    'pump_off':'Deactivating pump...',
-    'auto_mode':'Switching to auto mode...',
-    'manual_mode':'Switching to manual mode...'
-  };
-  showNotif(msgs[cmd]||cmd,'ok');
-  sysLog(`CMD sent: ${cmd}`,'ll');
+// ════════════════════════════════════════════════════
+//  PROCESS MESSAGE (voice or text)
+// ════════════════════════════════════════════════════
+async function processMessage(input){
+  setStat('THINKING...','thinking');
+  showThink();
+
+  const t = input.toLowerCase();
+  let response = '';
+
+  // Sensor control commands (direct, no AI needed)
+  if(chatMode==='sensor'){
+    if(/(activate|turn on|start|enable|pump on|nyalakan|aktifkan).*(pump|water|pompa|air)/.test(t)||/(pump|pompa).*(on|aktif|nyala|hidup)/.test(t)){
+      sendCmd('pump_on');
+      removeThink();
+      respond(`Water pump activated. Command sent to ESP32. Soil moisture is currently ${moisture}%.`);return;
+    }
+    if(/(deactivate|turn off|stop|disable|pump off|matikan|nonaktifkan).*(pump|water|pompa|air)/.test(t)||/(pump|pompa).*(off|mati|stop|nonaktif)/.test(t)){
+      sendCmd('pump_off');
+      removeThink();
+      respond(`Water pump deactivated. Pump is now offline. Soil moisture: ${moisture}%.`);return;
+    }
+    if(/(auto|otomatis|automatic)/.test(t)){
+      sendCmd('auto_mode');
+      removeThink();
+      respond(`Switched to automatic mode. The pump will now be controlled automatically based on soil moisture thresholds.`);return;
+    }
+    if(/(manual|override)/.test(t)&&!/(auto|otomatis)/.test(t)){
+      sendCmd('manual_mode');
+      removeThink();
+      respond(`Switched to manual mode. You now have full control over the pump.`);return;
+    }
+  }
+
+  // AI response (Claude API)
+  const systemPrompt = getSensorContext(chatMode === 'agri' ? AGRI_SYSTEM : SENSOR_SYSTEM);
+  response = await callClaudeAI(input, systemPrompt);
+
+  removeThink();
+  respond(response);
 }
 
-function doManual(){
-  const v=document.getElementById('manToggle').checked;
-  sendCmd(v?'manual_mode':'auto_mode');
+function respond(text){
+  addAI(formatAIText(text));
+  speak(text);
 }
 
-function doPump(){
-  if(!manual){document.getElementById('pToggle').checked=pump;return;}
-  const v=document.getElementById('pToggle').checked;
-  sendCmd(v?'pump_on':'pump_off');
+function runCmd(cmd){addUser(cmd);processMessage(cmd);}
+
+function sendText(){
+  const inp=document.getElementById('sdInput');
+  const v=inp.value.trim();
+  if(!v)return;
+  inp.value='';
+  inp.style.height='42px';
+  addUser(v);
+  processMessage(v);
 }
 
-function qData(){
-  openSD();
-  setTimeout(()=>runCmd('show current monitoring data'),700);
+// Format AI markdown-ish text for display
+function formatAIText(text){
+  return escHtml(text)
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n\n/g,'</p><p style="margin-top:8px">')
+    .replace(/\n/g,'<br>');
 }
 
-// ══════════════════════════════════════════════════════
-//  TTS — NATURAL AI VOICE (en-US, sentence chunking)
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  TTS
+// ════════════════════════════════════════════════════
 function speak(text,cb){
   if(!window.speechSynthesis){if(cb)cb();return;}
   window.speechSynthesis.cancel();
-  const chunks=(text.match(/[^.!?]+[.!?]*/g)||[text]).map(s=>s.trim()).filter(Boolean);
+  // Strip markdown for TTS
+  const clean=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/#+\s/g,'');
+  const chunks=(clean.match(/[^.!?]+[.!?]*/g)||[clean]).map(s=>s.trim()).filter(Boolean);
   let i=0;
   function next(){
-    if(i>=chunks.length){
-      talking=false;setWave('idle');setStat('TALK TO SPRAYDAY','');
-      if(cb)cb();return;
-    }
+    if(i>=chunks.length){talking=false;setWave('idle');setStat('READY TO ASSIST','');if(cb)cb();return;}
     const u=new SpeechSynthesisUtterance(chunks[i++]);
-    u.lang='en-US';u.rate=1.08;u.pitch=1.0;u.volume=1.0;
+    u.lang='en-US';u.rate=1.08;u.pitch=1.0;u.volume=1;
     const vv=window.speechSynthesis.getVoices();
-    const v=
-      vv.find(v=>v.name==='Google US English')||
-      vv.find(v=>v.name.includes('Samantha'))||
-      vv.find(v=>v.name.includes('Zira'))||
-      vv.find(v=>v.name.includes('Karen'))||
-      vv.find(v=>v.lang==='en-US'&&v.name.toLowerCase().includes('female'))||
-      vv.find(v=>v.lang==='en-US')||
-      vv.find(v=>v.lang.startsWith('en'))||
-      vv[0];
+    const v=vv.find(v=>v.name==='Google US English')||vv.find(v=>v.name.includes('Samantha'))||
+      vv.find(v=>v.name.includes('Zira'))||vv.find(v=>v.lang==='en-US')||vv.find(v=>v.lang.startsWith('en'))||vv[0];
     if(v)u.voice=v;
     u.onstart=()=>{talking=true;setWave('speaking');setStat('SPEAKING...','speaking')};
     u.onend=next;u.onerror=next;
@@ -917,39 +849,36 @@ function speak(text,cb){
   next();
 }
 
-// ══════════════════════════════════════════════════════
-//  SPEECH RECOGNITION — handles all error cases
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  SPEECH RECOGNITION
+// ════════════════════════════════════════════════════
 function hasSR(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
 
 function toggleMic(){
-  if(talking){window.speechSynthesis.cancel();talking=false;setWave('idle');setStat('TALK TO SPRAYDAY','');}
+  if(talking){window.speechSynthesis.cancel();talking=false;setWave('idle');setStat('READY TO ASSIST','');}
   if(isRec){endRec();return;}
   startRec();
 }
 
 function startRec(){
   if(!hasSR()){
-    showWarn('Your browser does not support voice input. Please use Google Chrome or Microsoft Edge for voice features. All command buttons below work on every device and browser.');
-    respond("Voice input is not supported in this browser. I recommend using the quick command buttons below, or open this page in Chrome or Edge for voice support.");
+    showWarn('Voice input requires Chrome or Edge browser. Use the text input or quick command buttons instead.');
     return;
   }
   navigator.mediaDevices.getUserMedia({audio:true,video:false})
     .then(stream=>{
       stream.getTracks().forEach(t=>t.stop());
-      hideWarn();
-      beginListening();
+      hideWarn();beginListening();
     })
     .catch(err=>{
       const n=err.name||'';
-      if(n.includes('NotAllowed')||n.includes('Permission')||n.includes('Denied')){
-        showWarn('Microphone blocked. To fix: tap the lock/info icon in the browser address bar → Microphone → Allow → tap mic again.');
-        respond("Microphone access is blocked. To fix this: look for a microphone or lock icon in your browser's address bar, tap it, set microphone to Allow, then tap the mic button again.");
+      if(n.includes('NotAllowed')||n.includes('Permission')){
+        showWarn('Microphone blocked. Tap the lock icon in address bar → Microphone → Allow → try again.');
+        addAI('Microphone access blocked. Please tap the lock icon in the browser address bar, set microphone to Allow, then try again.');
       } else if(n.includes('NotFound')){
-        showWarn('No microphone found on this device. Connect a microphone or use the command buttons.');
-        respond("No microphone was detected. Please use the command buttons below, or connect a microphone and try again.");
+        showWarn('No microphone found. Use text input or command buttons.');
       } else {
-        respond("Unable to access the microphone. Please use the quick command buttons below.");
+        addAI('Cannot access microphone. Please use the text input below or tap a command button.');
       }
     });
 }
@@ -957,160 +886,129 @@ function startRec(){
 function beginListening(){
   const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
   recog=new SRC();
+  
   recog.lang='en-US';
-  recog.continuous=false;
-  recog.interimResults=false;
-  recog.maxAlternatives=5;
-
-  recog.onstart=()=>{
-    isRec=true;
-    document.getElementById('micBtn').classList.add('rec');
-    setWave('listening');setStat('LISTENING...','listening');
-    setHint('LISTENING — TAP TO STOP');
-  };
+  recog.continuous=false;recog.interimResults=false;recog.maxAlternatives=5;
+  recog.onstart=()=>{isRec=true;document.getElementById('micBtn').classList.add('rec');
+    setWave('listening');setStat('LISTENING...','listening');setHint('LISTENING — TAP TO STOP')};
   recog.onspeechstart=()=>setStat('VOICE DETECTED...','listening');
   recog.onresult=e=>{
-    const t=Array.from(e.results[0]).map(a=>a.transcript).join(' ').toLowerCase().trim();
-    endRec();
-    addUser(t);
-    processVoice(t);
+    const t=Array.from(e.results[0]).map(a=>a.transcript).join(' ').trim();
+    endRec();addUser(t);processMessage(t);
   };
-  recog.onnomatch=()=>{
-    endRec();
-    respond("I didn't catch that. Please speak clearly and try again, or use the command buttons below.");
-  };
+  recog.onnomatch=()=>{endRec();addAI("I didn't catch that clearly. Please speak closer to the microphone and try again, or type your question in the text input below.");};
   recog.onerror=e=>{
     endRec();
-    const m={
-      'not-allowed':"Microphone access was blocked. Tap the lock icon in the address bar and allow microphone, then try again.",
-      'permission-denied':"Microphone permission denied. Please allow it in browser settings.",
-      'no-speech':"I didn't hear anything. Tap the mic and speak within a few seconds.",
-      'network':"Speech recognition network error. Check your internet connection.",
-      'audio-capture':"No microphone detected. Please connect one or use the command buttons.",
-      'aborted':"Voice recognition cancelled. Tap the mic to try again.",
-    };
-    respond(m[e.error]||"Voice recognition error. Please try again or use the command buttons.");
+    const m={'not-allowed':'Microphone blocked. Allow it in browser settings.','no-speech':'No speech detected. Tap mic and speak clearly.','network':'Speech service network error.','audio-capture':'No microphone detected.'};
+    addAI(m[e.error]||'Voice error. Please try again or use the text input.');
   };
   recog.onend=()=>{if(isRec)endRec();};
-
-  try{recog.start();}
-  catch(e){endRec();respond("Could not start voice recognition. Please try again.");}
+  try{recog.start();}catch(e){endRec();}
 }
 
 function endRec(){
-  isRec=false;
-  if(recog){try{recog.stop();}catch(e){} recog=null;}
+  isRec=false;if(recog){try{recog.stop();}catch(e){}recog=null;}
   document.getElementById('micBtn').classList.remove('rec');
-  setHint('TAP TO SPEAK');
-  if(!talking){setWave('idle');setStat('PROCESSING...','thinking');}
+  setHint('TAP TO SPEAK');if(!talking){setWave('idle');setStat('PROCESSING...','thinking');}
 }
 
-// ══════════════════════════════════════════════════════
-//  VOICE COMMAND PROCESSOR
-// ══════════════════════════════════════════════════════
-async function processVoice(input){
-  setStat('PROCESSING...','thinking');
-  showThink();
-  await wait(500);
-  const t=input.toLowerCase();
-  let r='';
-
-  if(/(activate|turn on|start|enable|switch on|power on).*(pump|water|irrigat|spray)|pump.*(on|activ|start|enable)/.test(t)){
-    sendCmd('pump_on');
-    r=`Activating water pump now. The command has been sent to your ESP32 device. Soil moisture is currently at ${moisture} percent. System switched to manual mode.`;
-    sysLog('Pump ON via voice','lo');
-  }
-  else if(/(deactivate|turn off|stop|disable|switch off|power off|shut).*(pump|water|irrigat|spray)|pump.*(off|deactiv|stop|disable|shut)/.test(t)){
-    sendCmd('pump_off');
-    r=`Deactivating water pump now. The command has been sent to your ESP32. The pump will stop shortly. Soil moisture is currently at ${moisture} percent.`;
-    sysLog('Pump OFF via voice','lw');
-  }
-  else if(/(monitor|data|status|reading|sensor|value|report|current|show|what is|how is|level)/.test(t)){
-    r=`Current monitoring data: soil moisture is at ${moisture} percent, which is ${moisture<30?'critically dry':moisture<50?'dry':moisture<70?'in normal range':'well saturated'}. The water pump is ${pump?'currently active and running':'offline in standby'}. System is in ${manual?'manual override':'automatic control'} mode.`;
-    sysLog('Data report via voice','ll');
-  }
-  else if(/(analyz|analys|advis|recommend|suggest|should|best|what to do|check|plan)/.test(t)){
-    if(moisture<30){
-      r=`Analysis complete. Soil moisture is critically low at ${moisture} percent — below the 30 percent minimum threshold. Activating the water pump immediately.`;
-      setTimeout(()=>{sendCmd('pump_on');sysLog('Auto pump ON from analysis','lo');},1800);
-    } else if(moisture<=70){
-      r=`Analysis complete. Soil moisture is at ${moisture} percent — within the optimal range of 30 to 70 percent. Your plant is healthy. No irrigation needed right now.`;
-      if(pump){setTimeout(()=>{sendCmd('pump_off');},1800);}
-    } else {
-      r=`Analysis complete. Soil moisture is high at ${moisture} percent — above the 70 percent maximum. The soil is saturated. Do not irrigate. Ensure adequate drainage to protect the roots.`;
-      if(pump){setTimeout(()=>{sendCmd('pump_off');},1500);}
-    }
-    sysLog('System analysis via voice','ll');
-  }
-  else if(/(auto|automatic mode|auto mode)/.test(t)){
-    sendCmd('auto_mode');
-    r="Switching to automatic mode. The system will now control the pump automatically based on soil moisture readings.";
-  }
-  else if(/(manual|manual mode|override)/.test(t)){
-    sendCmd('manual_mode');
-    r="Switching to manual mode. You now have full control over the pump via voice commands or the dashboard buttons.";
-  }
-  else if(/(hello|hi |hey|greet|good morning|good afternoon|good evening)/.test(t)){
-    r=`Hello! I'm Sprayday, your intelligent irrigation assistant. I can activate or deactivate the pump, report sensor data, and analyze soil conditions. Soil moisture is currently ${moisture} percent. How can I help?`;
-  }
-  else if(/(test|working|are you|can you hear|online)/.test(t)){
-    r=`Sprayday is online and operational. MQTT connection is ${mqttOk?'active':'offline'}. Currently monitoring soil moisture at ${moisture} percent. All systems ready.`;
-  }
-  else{
-    r=`I didn't recognize that command. You can say: activate the water pump, deactivate the water pump, show monitoring data, analyze and advise, switch to auto mode, or switch to manual mode.`;
-  }
-  removeThink();
-  respond(r);
-}
-
-function respond(text){addAI(text);speak(text);}
-function runCmd(cmd){addUser(cmd);processVoice(cmd);}
-
-// ══════════════════════════════════════════════════════
-//  OPEN / CLOSE SPRAYDAY
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  OPEN / CLOSE
+// ════════════════════════════════════════════════════
 function openSD(){
   document.getElementById('sdModal').classList.add('open');
   document.getElementById('app').classList.add('dim');
   if(window.speechSynthesis)window.speechSynthesis.getVoices();
   if(!sdOpened){
     sdOpened=true;
+    // Reset conversation history for fresh start
+    convHistory=[];
     setTimeout(()=>{
-      const w=`Welcome to Sprayday System. I am your intelligent plant irrigation assistant connected via cloud MQTT. I can control your water pump, read sensor data, and analyze soil conditions from anywhere in the world. How can I assist you?`;
-      addAI(w);speak(w);
+      const w=`Welcome to Sprayday AI. I am your intelligent agricultural assistant. I can help you control the irrigation system, provide farming guides for rice, coffee, chili, onion, and any other crop, and answer all your questions about agriculture and farming. Current soil moisture is ${moisture} percent. How can I assist you today?`;
+      addAI(formatAIText(w));speak(w);
     },500);
   }
 }
 function closeSD(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
-  if(isRec)endRec();
-  talking=false;
+  if(isRec)endRec();talking=false;
   document.getElementById('sdModal').classList.remove('open');
   document.getElementById('app').classList.remove('dim');
-  setWave('idle');setStat('TALK TO SPRAYDAY','');
+  setWave('idle');setStat('READY TO ASSIST','');
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  MQTT
+// ════════════════════════════════════════════════════
+function initMQTT(){
+  if(typeof Paho==='undefined'){sysLog('MQTT lib missing','le');return;}
+  const cid='dashboard-'+DEVICE_ID+'-'+Math.random().toString(16).slice(2,8);
+  mqttClient=new Paho.MQTT.Client(BROKER,WS_PORT,'/mqtt',cid);
+  mqttClient.onConnectionLost=res=>{mqttOk=false;setConn(false,'Reconnecting...');sysLog('MQTT lost: '+res.errorMessage,'le');setTimeout(connectMQTT,3000);};
+  mqttClient.onMessageArrived=msg=>{try{const d=JSON.parse(msg.payloadString);updateData(d);}catch(e){}};
+  connectMQTT();
+}
+function connectMQTT(){
+  if(!mqttClient)return;
+  mqttClient.connect({useSSL:true,timeout:10,keepAliveInterval:30,cleanSession:true,
+    onSuccess:()=>{mqttOk=true;setConn(true,'Connected');sysLog('MQTT connected','lo');
+      mqttClient.subscribe(T_SENSOR);mqttClient.subscribe(T_STATUS);
+      sysLog('Subscribed to '+DEVICE_ID,'ll');pubCmd('ping');},
+    onFailure:e=>{mqttOk=false;setConn(false,'Failed');sysLog('MQTT fail: '+e.errorMessage,'le');setTimeout(connectMQTT,5000);}});
+}
+function setConn(ok,msg){
+  document.getElementById('connDot').className='cdot '+(ok?'ok':'err');
+  document.getElementById('dispMqtt').textContent=msg;
+  document.getElementById('connBar').className=ok?'ok':'err';
+  document.getElementById('liveLabel').textContent=ok?'LIVE — MQTT CLOUD':'CONNECTION LOST';
+}
+function pubCmd(cmd){if(!mqttClient||!mqttOk)return;const m=new Paho.MQTT.Message(JSON.stringify({cmd}));m.destinationName=T_CMD;m.qos=0;mqttClient.send(m);}
+function sendCmd(cmd){
+  if(!mqttOk){showNotif('Not connected to ESP32','err');return;}
+  pubCmd(cmd);
+  const labels={pump_on:'Activating pump...',pump_off:'Deactivating pump...',auto_mode:'Switching to AUTO...',manual_mode:'Switching to MANUAL...'};
+  showNotif(labels[cmd]||cmd,'ok');sysLog('CMD: '+cmd,'ll');
+}
+function updateData(d){
+  const pp=pump,pm=manual;
+  if(d.moisture!==undefined)moisture=d.moisture;
+  if(d.pump!==undefined)pump=d.pump;
+  if(d.manual!==undefined)manual=d.manual;
+  updateGauge(moisture);updatePumpUI(pump);
+  const mp=document.getElementById('modePill');
+  mp.textContent=manual?'◆ MANUAL MODE':'◆ AUTO MODE';mp.className='mode-pill'+(manual?' man':'');
+  document.getElementById('manToggle').checked=manual;
+  document.getElementById('pToggle').checked=pump;document.getElementById('pToggle').disabled=!manual;
+  document.getElementById('manSub').textContent=manual?'MANUAL OVERRIDE ACTIVE':'AUTO LOGIC ACTIVE';
+  const now=new Date().toLocaleTimeString('en-US',{hour12:false});
+  document.getElementById('dispSync').textContent=now;document.getElementById('footSync').textContent='SYNCED '+now;
+  if(pp!==pump)sysLog('Pump: '+(pump?'ACTIVE':'OFFLINE'),pump?'lo':'lw');
+  if(pm!==manual)sysLog('Mode: '+(manual?'MANUAL':'AUTO'),manual?'lw':'lo');
+}
+function doManual(){sendCmd(document.getElementById('manToggle').checked?'manual_mode':'auto_mode');}
+function doPump(){if(!manual){document.getElementById('pToggle').checked=pump;return;}sendCmd(document.getElementById('pToggle').checked?'pump_on':'pump_off');}
+function qData(){openSD();setTimeout(()=>runCmd('show current sensor and moisture data'),700);}
+
+// ════════════════════════════════════════════════════
 //  UI HELPERS
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
 function updateGauge(pct){
-  const col=pct<30?'#ff3366':pct>70?'#00ff88':'#00fff7';
+  const col=pct<30?'#ff3355':pct>70?'#2dff7a':'#2dff7a';
   const arc=document.getElementById('gArc');
   arc.style.strokeDashoffset=(335-pct/100*335*.833).toString();
-  arc.style.stroke=col;
-  arc.style.filter=`drop-shadow(0 0 5px ${col})`;
+  arc.style.stroke=col;arc.style.filter=`drop-shadow(0 0 5px ${col})`;
   document.getElementById('gNum').textContent=pct;
   document.getElementById('bM').style.width=pct+'%';
-  document.getElementById('bM').className='db-f '+(pct<30?'fr':pct>70?'fg':'fc');
+  document.getElementById('bM').className='dbf '+(pct<30?'fr':pct>70?'fg':'fg');
   document.getElementById('vM').textContent=pct+'%';
   const gb=document.getElementById('gBadge');
-  if(pct<30){gb.textContent='CRITICAL DRY';gb.className='gauge-badge dry';}
-  else if(pct>70){gb.textContent='SATURATED';gb.className='gauge-badge wet';}
-  else{gb.textContent='OPTIMAL';gb.className='gauge-badge';}
+  if(pct<30){gb.textContent='CRITICAL DRY';gb.className='gbadge dry';}
+  else if(pct>70){gb.textContent='SATURATED';gb.className='gbadge wet';}
+  else{gb.textContent='OPTIMAL';gb.className='gbadge';}
 }
 function updatePumpUI(on){
   document.getElementById('pOrb').className='pump-orb'+(on?' on':'');
-  document.getElementById('pIcon').textContent=on?'\uD83D\uDCA7':'\uD83D\uDD0C';
+  document.getElementById('pIcon').textContent=on?'💧':'🔌';
   document.getElementById('pState').className='pump-state'+(on?' on':'');
   document.getElementById('pState').textContent=on?'ACTIVE':'STANDBY';
   document.getElementById('pSub').className='pump-sub'+(on?' on':'');
@@ -1121,57 +1019,42 @@ function setStat(t,c){const e=document.getElementById('sdStat');e.textContent=t;
 function setHint(t){document.getElementById('micHint').textContent=t;}
 function showWarn(t){const w=document.getElementById('micWarn');w.textContent=t;w.style.display='block';}
 function hideWarn(){document.getElementById('micWarn').style.display='none';}
-function wait(ms){return new Promise(r=>setTimeout(r,ms));}
-
 function addUser(t){
   const c=document.getElementById('sdChat');
   const d=document.createElement('div');d.className='msg u';
-  d.innerHTML=`<div class="m-lbl">YOU</div><div class="m-bub">${escHtml(t)}</div>`;
+  d.innerHTML=`<div class="mlbl">YOU</div><div class="mbub">${escHtml(t)}</div>`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 function addAI(t){
   removeThink();
   const c=document.getElementById('sdChat');
   const d=document.createElement('div');d.className='msg a';
-  d.innerHTML=`<div class="m-lbl">SPRAYDAY</div><div class="m-bub">${escHtml(t)}</div>`;
+  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub"><p>${t}</p></div>`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 function showThink(){
   removeThink();
   const c=document.getElementById('sdChat');
   const d=document.createElement('div');d.className='msg a';d.id='thinkEl';
-  d.innerHTML=`<div class="m-lbl">SPRAYDAY</div><div class="m-bub">
-    <div class="think-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>`;
+  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub"><div class="think-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 function removeThink(){const t=document.getElementById('thinkEl');if(t)t.remove();}
-function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sysLog(msg,cls){
   const now=new Date().toLocaleTimeString('en-US',{hour12:false});
   logArr.push(`<span class="${cls||'ll'}">[${now}] ${msg}</span>`);
   if(logArr.length>50)logArr.shift();
-  const lb=document.getElementById('logBox');
-  lb.innerHTML=logArr.join('<br>');
-  lb.scrollTop=lb.scrollHeight;
+  const lb=document.getElementById('logBox');lb.innerHTML=logArr.join('<br>');lb.scrollTop=lb.scrollHeight;
 }
-
-let notifTimer=null;
+let ntTmr=null;
 function showNotif(msg,type){
-  let n=document.getElementById('notifEl');
-  if(n)n.remove();
-  n=document.createElement('div');
-  n.id='notifEl';n.className='notif '+type;n.textContent=msg;
-  document.body.appendChild(n);
-  clearTimeout(notifTimer);
-  notifTimer=setTimeout(()=>{if(n)n.remove();},2500);
+  let n=document.getElementById('ntfEl');if(n)n.remove();
+  n=document.createElement('div');n.id='ntfEl';n.className='notif '+type;n.textContent=msg;
+  document.body.appendChild(n);clearTimeout(ntTmr);ntTmr=setTimeout(()=>{if(n)n.remove();},2500);
 }
-
-// Pre-load TTS voices
-if(window.speechSynthesis){
-  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
-  window.speechSynthesis.getVoices();
-}
+// TTS voice preload
+if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();window.speechSynthesis.getVoices();}
 </script>
 </body>
 </html>
