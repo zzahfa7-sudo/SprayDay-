@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>HYDRA-32 | Sprayday Assistance</title>
+<title>JABABENDA PROJECT | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -399,7 +399,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <div class="ls-core">🌿</div>
   </div>
   <div class="ls-title">Sprayday Assistance</div>
-  <div class="ls-tag">AI-POWERED AGRICULTURAL SYSTEM</div>
+  <div class="ls-tag"> GEMINI AI-POWERED AGRICULTURAL SYSTEM</div>
   <div class="ls-track"><div class="ls-fill"></div></div>
   <div class="ls-msg" id="lsMsg">INITIALIZING...</div>
 </div>
@@ -407,7 +407,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">SPRAYDAY&#8209;ASSITANCE</div>
+    <div class="logo">SPRAYDAY&#8209;ASSISTANCE</div>
     <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
@@ -480,7 +480,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
       <div class="qbtn q-on" onclick="sendCmd('pump_on')"><span class="qi">💧</span><span class="ql">ACTIVATE PUMP</span></div>
       <div class="qbtn q-off" onclick="sendCmd('pump_off')"><span class="qi">🔌</span><span class="ql">DEACTIVATE PUMP</span></div>
       <div class="qbtn q-data" onclick="qData()"><span class="qi">📊</span><span class="ql">VIEW DATA</span></div>
-      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY ASSISTANCE</span></div>
+      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY AI</span></div>
     </div>
   </div>
 
@@ -500,7 +500,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-  <div class="app-footer">SPRAYDAY ASSISTANCE // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+  <div class="app-footer">SPRAYDAY // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
 </div>
 
 <!-- FAB -->
@@ -625,7 +625,7 @@ const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMs
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('SprayDay Assistance + Sprayday AI v6.0 loaded','lo');
+    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
     sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
     renderChips();
