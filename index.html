@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>JABABENDA PROJECT | Sprayday Assistance</title>
+<title>HYDRA-32 | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -381,6 +381,47 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 .notif.err{background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.28);
   color:var(--r);box-shadow:0 0 18px rgba(255,51,85,.12)}
 @keyframes nIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+
+/* ═══ API KEY MODAL ═══ */
+#apiModal{display:none;position:fixed;inset:0;z-index:9500;
+  background:rgba(1,6,2,.96);backdrop-filter:blur(18px);
+  align-items:center;justify-content:center}
+#apiModal.open{display:flex}
+.api-box{background:var(--bg3);border:1px solid var(--leaf);border-radius:6px;
+  padding:32px 28px;max-width:420px;width:90%;position:relative}
+.api-box::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(45,255,122,.6),transparent)}
+.api-title{font-family:var(--title);font-size:.9rem;font-weight:900;letter-spacing:4px;
+  color:var(--leaf);margin-bottom:6px}
+.api-sub{font-size:.58rem;letter-spacing:1.5px;color:var(--t2);margin-bottom:20px;line-height:1.8;opacity:.7}
+.api-inp{width:100%;background:#010a03;border:1px solid var(--bo2);
+  border-radius:3px;padding:11px 14px;color:var(--t1);
+  font-family:var(--mono);font-size:.78rem;outline:none;
+  transition:border-color .25s;margin-bottom:14px}
+.api-inp:focus{border-color:var(--leaf);box-shadow:0 0 8px rgba(45,255,122,.12)}
+.api-inp::placeholder{color:var(--t3);opacity:.5}
+.api-btns{display:flex;gap:10px}
+.api-save{flex:1;padding:11px;background:rgba(45,255,122,.08);
+  border:1px solid var(--leaf);color:var(--leaf);border-radius:3px;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:2px;cursor:pointer;transition:all .25s}
+.api-save:hover{background:rgba(45,255,122,.15)}
+.api-cancel{padding:11px 16px;background:transparent;
+  border:1px solid var(--bo2);color:var(--t3);border-radius:3px;
+  font-family:var(--mono);font-size:.7rem;cursor:pointer;transition:all .25s}
+.api-cancel:hover{border-color:var(--r);color:var(--r)}
+.api-note{font-size:.53rem;color:var(--t3);margin-top:14px;line-height:1.8;opacity:.55}
+.api-note a{color:var(--leaf);text-decoration:none}
+.api-status{font-size:.58rem;letter-spacing:1px;padding:6px 12px;border-radius:2px;
+  margin-bottom:10px;display:none}
+.api-status.ok{display:block;color:var(--leaf);background:rgba(45,255,122,.06);
+  border:1px solid rgba(45,255,122,.2)}
+.api-status.err{display:block;color:var(--r);background:rgba(255,51,85,.06);
+  border:1px solid rgba(255,51,85,.2)}
+.api-key-btn{font-family:var(--title);font-size:.48rem;font-weight:700;letter-spacing:1.5px;
+  padding:5px 10px;border-radius:2px;border:1px solid rgba(45,255,122,.3);color:rgba(45,255,122,.6);
+  background:rgba(45,255,122,.03);cursor:pointer;transition:all .3s}
+.api-key-btn:hover{border-color:var(--leaf);color:var(--leaf);}
+.api-key-btn.set{border-color:var(--leaf);color:var(--leaf);background:rgba(45,255,122,.06)}
 </style>
 </head>
 <body>
@@ -399,7 +440,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <div class="ls-core">🌿</div>
   </div>
   <div class="ls-title">Sprayday Assistance</div>
-  <div class="ls-tag"> GEMINI AI-POWERED AGRICULTURAL SYSTEM</div>
+  <div class="ls-tag">AI-POWERED AGRICULTURAL SYSTEM</div>
   <div class="ls-track"><div class="ls-fill"></div></div>
   <div class="ls-msg" id="lsMsg">INITIALIZING...</div>
 </div>
@@ -407,11 +448,12 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">SPRAYDAY&#8209;ASSISTANCE</div>
+    <div class="logo">HYDRA&#8209;32</div>
     <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
       <div class="live-pill"><span class="live-dot"></span><span id="liveLabel">CONNECTING...</span></div>
+      <button class="api-key-btn" id="apiKeyBtn" onclick="showApiKeyModal()">⚙ API KEY</button>
       <span id="modePill" class="mode-pill">&#9670; AUTO MODE</span>
     </div>
   </div>
@@ -500,7 +542,26 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-  <div class="app-footer">SPRAYDAY // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+  <div class="app-footer">HYDRA-32 // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+</div>
+
+<!-- ═══════════════ API KEY MODAL ═══════════════ -->
+<div id="apiModal">
+  <div class="api-box">
+    <div class="api-title">⚙ ANTHROPIC API KEY</div>
+    <div class="api-sub">Masukkan API Key Anda agar Sprayday AI dapat merespons pertanyaan dan menganalisis data sensor.</div>
+    <div class="api-status" id="apiStatus"></div>
+    <input class="api-inp" id="apiInp" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"/>
+    <div class="api-btns">
+      <button class="api-save" onclick="saveApiKey()">✓ SIMPAN & AKTIFKAN</button>
+      <button class="api-cancel" onclick="closeApiModal()">BATAL</button>
+    </div>
+    <div class="api-note">
+      Dapatkan API Key di: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+      API Key disimpan di browser lokal Anda (tidak dikirim ke server lain).<br>
+      Format: <span style="color:var(--t2)">sk-ant-api03-xxxxxxxxxxxx...</span>
+    </div>
+  </div>
 </div>
 
 <!-- FAB -->
@@ -523,7 +584,10 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
         <div class="sd-wordmark">&#9670; SPRAYDAY AI</div>
         <div class="sd-tagline">AGRICULTURAL INTELLIGENCE ASSISTANT</div>
       </div>
-      <button class="sd-close" onclick="closeSD()">&#10005;</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="api-key-btn" id="apiKeyBtnModal" onclick="showApiKeyModal()" style="font-size:.44rem">⚙ API KEY</button>
+        <button class="sd-close" onclick="closeSD()">&#10005;</button>
+      </div>
     </div>
 
     <div class="av-section">
@@ -682,14 +746,26 @@ function setMode(m){
 //  CLAUDE AI API CALL
 // ════════════════════════════════════════════════════
 async function callClaudeAI(userMessage, systemPrompt){
+  // Cek API key dulu
+  const apiKey = localStorage.getItem('sprayday_apikey') || '';
+  if(!apiKey){
+    showApiKeyModal();
+    return '⚠️ API Key belum diset. Masukkan Anthropic API Key Anda terlebih dahulu melalui tombol [⚙ API KEY] di atas.';
+  }
+
   // Add to conversation history for context
   convHistory.push({role:'user',content:userMessage});
-  if(convHistory.length>12) convHistory=convHistory.slice(-12); // Keep last 6 turns
+  if(convHistory.length>12) convHistory=convHistory.slice(-12);
 
   try{
     const resp = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:1000,
@@ -697,14 +773,29 @@ async function callClaudeAI(userMessage, systemPrompt){
         messages: convHistory
       })
     });
+
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({}));
+      if(resp.status===401){
+        localStorage.removeItem('sprayday_apikey');
+        showApiKeyModal();
+        return '❌ API Key tidak valid atau sudah kadaluarsa. Silakan masukkan API Key yang benar.';
+      }
+      if(resp.status===429) return '⚠️ Terlalu banyak permintaan. Tunggu beberapa detik lalu coba lagi.';
+      return `❌ Error dari server (${resp.status}): ${err.error?.message||'Unknown error'}`;
+    }
+
     const data = await resp.json();
-    const text = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
-    // Add assistant response to history
+    const text = data.content?.[0]?.text || 'Maaf, tidak bisa menghasilkan respons.';
     convHistory.push({role:'assistant',content:text});
     if(convHistory.length>12) convHistory=convHistory.slice(-12);
     return text;
   }catch(e){
-    return `I encountered an error connecting to the AI service. Please check your connection and try again.`;
+    console.error('Claude API error:',e);
+    if(e.message&&e.message.includes('Failed to fetch')){
+      return '❌ Gagal terhubung ke server AI. Pastikan koneksi internet aktif dan tidak ada pemblokiran dari browser/firewall.';
+    }
+    return `❌ Terjadi kesalahan: ${e.message||'Unknown error'}`;
   }
 }
 
@@ -1055,6 +1146,63 @@ function showNotif(msg,type){
 }
 // TTS voice preload
 if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();window.speechSynthesis.getVoices();}
+
+// ════════════════════════════════════════════════════
+//  API KEY MANAGEMENT
+// ════════════════════════════════════════════════════
+function showApiKeyModal(){
+  const modal=document.getElementById('apiModal');
+  modal.classList.add('open');
+  const saved=localStorage.getItem('sprayday_apikey')||'';
+  const inp=document.getElementById('apiInp');
+  // Tampilkan masked jika sudah ada key
+  inp.value=saved?saved:'';
+  inp.placeholder=saved?'sk-ant-... (sudah tersimpan, isi baru untuk ganti)':'sk-ant-api03-...';
+  document.getElementById('apiStatus').style.display='none';
+  updateApiKeyBtn();
+}
+
+function closeApiModal(){
+  document.getElementById('apiModal').classList.remove('open');
+}
+
+function saveApiKey(){
+  const v=document.getElementById('apiInp').value.trim();
+  const st=document.getElementById('apiStatus');
+  if(!v){
+    st.className='api-status err';st.textContent='❌ API Key tidak boleh kosong.';st.style.display='block';return;
+  }
+  if(!v.startsWith('sk-ant-')){
+    st.className='api-status err';st.textContent='❌ Format salah. API Key harus dimulai dengan "sk-ant-"';st.style.display='block';return;
+  }
+  localStorage.setItem('sprayday_apikey',v);
+  st.className='api-status ok';st.textContent='✓ API Key berhasil disimpan! AI siap digunakan.';st.style.display='block';
+  updateApiKeyBtn();
+  sysLog('API Key tersimpan — AI aktif','lo');
+  setTimeout(closeApiModal,1200);
+}
+
+function updateApiKeyBtn(){
+  const hasKey=!!localStorage.getItem('sprayday_apikey');
+  const cls='api-key-btn'+(hasKey?' set':'');
+  const lbl=hasKey?'✓ API KEY':'⚙ API KEY';
+  const b1=document.getElementById('apiKeyBtn');
+  const b2=document.getElementById('apiKeyBtnModal');
+  if(b1){b1.className=cls;b1.textContent=lbl;}
+  if(b2){b2.className=cls;b2.textContent=lbl;b2.style.fontSize='.44rem';}
+}
+
+// Cek API key saat load
+document.addEventListener('DOMContentLoaded',()=>{updateApiKeyBtn();});
+window.addEventListener('load',()=>{
+  updateApiKeyBtn();
+  if(!localStorage.getItem('sprayday_apikey')){
+    // Tampilkan reminder halus setelah load
+    setTimeout(()=>{
+      sysLog('⚠ API Key belum diset — klik [⚙ API KEY] untuk mengaktifkan AI','lw');
+    },3500);
+  }
+});
 </script>
 </body>
 </html>
