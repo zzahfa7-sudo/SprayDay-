@@ -407,7 +407,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">HYDRA&#8209;32</div>
+    <div class="logo">SPRAYDAY&#8209;ASSITANCE</div>
     <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
@@ -480,7 +480,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
       <div class="qbtn q-on" onclick="sendCmd('pump_on')"><span class="qi">💧</span><span class="ql">ACTIVATE PUMP</span></div>
       <div class="qbtn q-off" onclick="sendCmd('pump_off')"><span class="qi">🔌</span><span class="ql">DEACTIVATE PUMP</span></div>
       <div class="qbtn q-data" onclick="qData()"><span class="qi">📊</span><span class="ql">VIEW DATA</span></div>
-      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY AI</span></div>
+      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY ASSISTANCE</span></div>
     </div>
   </div>
 
@@ -625,7 +625,7 @@ const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMs
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
+    sysLog('SprayDay Assistance + Sprayday AI v6.0 loaded','lo');
     sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
     renderChips();
