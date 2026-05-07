@@ -548,18 +548,20 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 <!-- ═══════════════ API KEY MODAL ═══════════════ -->
 <div id="apiModal">
   <div class="api-box">
-    <div class="api-title">⚙ ANTHROPIC API KEY</div>
-    <div class="api-sub">Masukkan API Key Anda agar Sprayday AI dapat merespons pertanyaan dan menganalisis data sensor.</div>
+    <div class="api-title">⚙ GOOGLE GEMINI API KEY</div>
+    <div class="api-sub">Masukkan API Key Google Gemini — <strong style="color:var(--leaf)">GRATIS 1500 request/hari</strong>. Tidak perlu kartu kredit!</div>
     <div class="api-status" id="apiStatus"></div>
-    <input class="api-inp" id="apiInp" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"/>
+    <input class="api-inp" id="apiInp" type="password" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"/>
     <div class="api-btns">
       <button class="api-save" onclick="saveApiKey()">✓ SIMPAN & AKTIFKAN</button>
       <button class="api-cancel" onclick="closeApiModal()">BATAL</button>
     </div>
     <div class="api-note">
-      Dapatkan API Key di: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
-      API Key disimpan di browser lokal Anda (tidak dikirim ke server lain).<br>
-      Format: <span style="color:var(--t2)">sk-ant-api03-xxxxxxxxxxxx...</span>
+      🆓 Dapatkan API Key GRATIS di:<br>
+      <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a><br><br>
+      Langkah: Login Google → "Get API Key" → "Create API Key" → Copy<br>
+      API Key disimpan di browser lokal Anda, aman &amp; tidak dikirim ke server lain.<br>
+      Format: <span style="color:var(--t2)">AIzaSy...</span>
     </div>
   </div>
 </div>
@@ -746,56 +748,43 @@ function setMode(m){
 //  CLAUDE AI API CALL
 // ════════════════════════════════════════════════════
 async function callClaudeAI(userMessage, systemPrompt){
-  // Cek API key dulu
   const apiKey = localStorage.getItem('sprayday_apikey') || '';
-  if(!apiKey){
-    showApiKeyModal();
-    return '⚠️ API Key belum diset. Masukkan Anthropic API Key Anda terlebih dahulu melalui tombol [⚙ API KEY] di atas.';
-  }
+  if(!apiKey){ showApiKeyModal(); return '⚠️ API Key Gemini belum diset. Klik tombol [⚙ API KEY] untuk memasukkan API Key gratis dari Google.'; }
 
-  // Add to conversation history for context
-  convHistory.push({role:'user',content:userMessage});
+  convHistory.push({role:'user', parts:[{text: userMessage}]});
   if(convHistory.length>12) convHistory=convHistory.slice(-12);
 
   try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: systemPrompt,
-        messages: convHistory
-      })
-    });
+    const body = {
+      system_instruction:{ parts:[{text: systemPrompt}] },
+      contents: convHistory,
+      generationConfig:{ maxOutputTokens:1000, temperature:0.7 }
+    };
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }
+    );
 
     if(!resp.ok){
       const err = await resp.json().catch(()=>({}));
-      if(resp.status===401){
+      if(resp.status===400&&err.error?.message?.includes('API_KEY')){
         localStorage.removeItem('sprayday_apikey');
         showApiKeyModal();
-        return '❌ API Key tidak valid atau sudah kadaluarsa. Silakan masukkan API Key yang benar.';
+        return '❌ API Key tidak valid. Silakan masukkan API Key Gemini yang benar.';
       }
       if(resp.status===429) return '⚠️ Terlalu banyak permintaan. Tunggu beberapa detik lalu coba lagi.';
-      return `❌ Error dari server (${resp.status}): ${err.error?.message||'Unknown error'}`;
+      return `❌ Error (${resp.status}): ${err.error?.message||'Unknown error'}`;
     }
 
     const data = await resp.json();
-    const text = data.content?.[0]?.text || 'Maaf, tidak bisa menghasilkan respons.';
-    convHistory.push({role:'assistant',content:text});
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, tidak ada respons dari AI.';
+    convHistory.push({role:'model', parts:[{text}]});
     if(convHistory.length>12) convHistory=convHistory.slice(-12);
     return text;
   }catch(e){
-    console.error('Claude API error:',e);
-    if(e.message&&e.message.includes('Failed to fetch')){
-      return '❌ Gagal terhubung ke server AI. Pastikan koneksi internet aktif dan tidak ada pemblokiran dari browser/firewall.';
-    }
-    return `❌ Terjadi kesalahan: ${e.message||'Unknown error'}`;
+    console.error('Gemini error:',e);
+    return '❌ Gagal terhubung ke AI. Pastikan koneksi internet aktif.';
   }
 }
 
@@ -1172,13 +1161,13 @@ function saveApiKey(){
   if(!v){
     st.className='api-status err';st.textContent='❌ API Key tidak boleh kosong.';st.style.display='block';return;
   }
-  if(!v.startsWith('sk-ant-')){
-    st.className='api-status err';st.textContent='❌ Format salah. API Key harus dimulai dengan "sk-ant-"';st.style.display='block';return;
+  if(!v.startsWith('AIza')){
+    st.className='api-status err';st.textContent='❌ Format salah. API Key Gemini harus dimulai dengan "AIza"';st.style.display='block';return;
   }
   localStorage.setItem('sprayday_apikey',v);
   st.className='api-status ok';st.textContent='✓ API Key berhasil disimpan! AI siap digunakan.';st.style.display='block';
   updateApiKeyBtn();
-  sysLog('API Key tersimpan — AI aktif','lo');
+  sysLog('Gemini API Key tersimpan — AI aktif','lo');
   setTimeout(closeApiModal,1200);
 }
 
