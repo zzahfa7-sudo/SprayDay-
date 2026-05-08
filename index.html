@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>Jababenda Project v1.0 | Sprayday Assistant</title>
+<title>Jababenda Project v1.0 | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -456,7 +456,7 @@ li.ai-li-num::before{content:none}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">JABABENDA&#8209;AGROTECH</div>
+    <div class="logo">&#8209;</div>
     <div class="logo-sub">SPRAYDAY ASSISTANT &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
@@ -597,7 +597,7 @@ li.ai-li-num::before{content:none}
   <div class="sd-shell">
     <div class="sd-top">
       <div class="sd-brand">
-        <div class="sd-wordmark">v1.0 &#9670; SPRAYDAY AI</div>
+        <div class="sd-wordmark">&#9670; SPRAYDAY AI</div>
         <div class="sd-tagline">AGRICULTURAL INTELLIGENCE ASSISTANT</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -720,7 +720,7 @@ const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMs
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('JABABENDA PROJECT + Sprayday AI v1.0 loaded','lo');
+    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
     sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
     renderChips();
@@ -1196,91 +1196,144 @@ async function callViaArtifact(systemPrompt, messages){
 async function callClaudeAI(userMessage, systemPrompt){
   const kbCtx = getKBContext(userMessage);
   const enrichedSystem = kbCtx
-    ? systemPrompt + '\n\n[KNOWLEDGE BASE CONTEXT — integrate naturally into answer]\n' + kbCtx
+    ? systemPrompt + '\n\n[REFERENCE DATA — integrate naturally, do not quote verbatim]\n' + kbCtx
     : systemPrompt;
   const msgs = [...convHistory.slice(-8), {role:'user', content: userMessage}];
 
-  // ══ METHOD 1: Direct Anthropic fetch (works from http://localhost) ══
-  try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:1000,system:enrichedSystem,messages:msgs})
-    });
-    if(resp.ok){
-      const data = await resp.json();
-      const text = data?.content?.[0]?.text;
-      if(text?.trim()){
-        convHistory.push({role:'user',content:userMessage});
-        convHistory.push({role:'assistant',content:text});
-        if(convHistory.length>20) convHistory=convHistory.slice(-20);
-        sysLog('AI: Anthropic direct ✓','lo');
-        return text;
+  const storedKey = (localStorage.getItem('sprayday_apikey')||'').trim();
+
+  // ══ METHOD 1: Anthropic Direct (sk-ant- key) ══
+  if(storedKey.startsWith('sk-ant-')){
+    try{
+      sysLog('AI: Trying Anthropic API...','ll');
+      const r = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': storedKey,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body: JSON.stringify({
+          model:'claude-haiku-4-5-20251001',
+          max_tokens:1200,
+          system: enrichedSystem,
+          messages: msgs
+        })
+      });
+      if(r.ok){
+        const d = await r.json();
+        const text = d?.content?.[0]?.text;
+        if(text?.trim()){
+          convHistory.push({role:'user',content:userMessage});
+          convHistory.push({role:'assistant',content:text});
+          if(convHistory.length>20) convHistory=convHistory.slice(-20);
+          sysLog('✓ Anthropic AI responded','lo');
+          return text;
+        }
+      } else {
+        const err = await r.json().catch(()=>({}));
+        const msg = err?.error?.message || 'HTTP '+r.status;
+        sysLog('Anthropic error: '+msg,'le');
+        if(r.status===401) return '⚠️ **Invalid Anthropic API Key.** Please re-enter your key — click [⚙ API KEY] at the top right.';
+        if(r.status===429) return '⚠️ **Rate limit reached.** Please wait a moment and try again.';
+        if(r.status===403) return '⚠️ **API Key permission error.** Make sure your key has Messages access enabled.';
+      }
+    }catch(e){ sysLog('Anthropic fetch error: '+e.message,'le'); }
+  }
+
+  // ══ METHOD 2: OpenRouter (sk-or- key) — tries paid models first, then free ══
+  if(storedKey.startsWith('sk-or-')){
+    // Model priority: paid high-quality → paid standard → free fallbacks
+    const MODELS = [
+      'anthropic/claude-haiku-4-5',           // Best quality, paid
+      'anthropic/claude-3-haiku',              // Good quality, low cost
+      'mistralai/mistral-small',               // Good quality, paid
+      'mistralai/mistral-7b-instruct',         // Free tier
+      'meta-llama/llama-3.1-8b-instruct',     // Free tier
+      'microsoft/phi-3-mini-128k-instruct:free', // Free tier
+    ];
+    sysLog('AI: Trying OpenRouter API...','ll');
+    for(const model of MODELS){
+      try{
+        const r = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer '+storedKey,
+            'HTTP-Referer':'https://zzahfa7-sudo.github.io/SprayDay-/',
+            'X-Title':'Sprayday AI — Agricultural Assistant'
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 1200,
+            temperature: 0.75,
+            messages:[{role:'system',content:enrichedSystem}, ...msgs]
+          })
+        });
+        if(r.ok){
+          const d = await r.json();
+          const text = d?.choices?.[0]?.message?.content;
+          if(text?.trim()){
+            convHistory.push({role:'user',content:userMessage});
+            convHistory.push({role:'assistant',content:text});
+            if(convHistory.length>20) convHistory=convHistory.slice(-20);
+            sysLog('✓ OpenRouter ('+model.split('/')[1]+') responded','lo');
+            return text;
+          }
+          // Empty response from this model — try next
+          sysLog('Model '+model+' returned empty, trying next...','lw');
+          continue;
+        } else {
+          const err = await r.json().catch(()=>({}));
+          const msg = err?.error?.message||'HTTP '+r.status;
+          if(r.status===401){
+            sysLog('OpenRouter 401: Invalid key','le');
+            return '⚠️ **Invalid OpenRouter API Key.** Please re-enter your key — click [⚙ API KEY] at the top right, then get a fresh key from openrouter.ai/keys';
+          }
+          if(r.status===402){
+            sysLog('OpenRouter 402: Insufficient credits','le');
+            // Credits issue — skip to free models only
+            if(!model.includes(':free')) continue;
+            return '⚠️ **OpenRouter credits depleted.** Add credits at openrouter.ai/credits, or use only the free models (this happens automatically).';
+          }
+          if(r.status===429){
+            sysLog('OpenRouter 429: Rate limit on '+model,'lw');
+            await new Promise(res=>setTimeout(res,1200));
+            continue;
+          }
+          sysLog('Model '+model+' error '+r.status+': '+msg.substring(0,60),'lw');
+          continue;
+        }
+      }catch(fe){
+        sysLog('Model '+model+' fetch failed: '+fe.message.substring(0,40),'lw');
+        continue;
       }
     }
-  }catch(e){ /* coba method berikutnya */ }
+    sysLog('All OpenRouter models failed — using KB fallback','le');
+  }
 
-  // ══ METHOD 2: Artifact proxy via postMessage (works inside Claude.ai) ══
+  // ══ METHOD 3: Artifact proxy (works inside Claude.ai) ══
   try{
     const text = await callViaArtifact(enrichedSystem, msgs);
     if(text?.trim()){
       convHistory.push({role:'user',content:userMessage});
       convHistory.push({role:'assistant',content:text});
       if(convHistory.length>20) convHistory=convHistory.slice(-20);
-      sysLog('AI: Artifact proxy ✓','lo');
+      sysLog('✓ Artifact proxy responded','lo');
       return text;
     }
-  }catch(e){ /* coba method berikutnya */ }
+  }catch(e){}
 
-  // ══ METHOD 3: OpenRouter dengan key user ══
-  const storedKey = localStorage.getItem('sprayday_apikey')||'';
-  if(storedKey.startsWith('sk-or-') || storedKey.startsWith('sk-ant-')){
-    try{
-      let text = null;
-      if(storedKey.startsWith('sk-ant-')){
-        const r = await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-api-key':storedKey,
-            'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-          body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:1000,system:enrichedSystem,messages:msgs})
-        });
-        if(r.ok){const d=await r.json();text=d?.content?.[0]?.text;}
-      } else {
-        for(const model of ['mistralai/mistral-7b-instruct:free','meta-llama/llama-3.1-8b-instruct:free','google/gemma-2-9b-it:free']){
-          try{
-            const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-              method:'POST',
-              headers:{'Content-Type':'application/json','Authorization':'Bearer '+storedKey,
-                'HTTP-Referer':'https://sprayday.local','X-Title':'Sprayday AI'},
-              body:JSON.stringify({model,max_tokens:1000,temperature:0.7,
-                messages:[{role:'system',content:enrichedSystem},...msgs]})
-            });
-            if(r.ok){const d=await r.json();text=d?.choices?.[0]?.message?.content;if(text)break;}
-            else{const e=await r.json().catch(()=>({}));
-              if(r.status===401) return formatAIText('⚠ **Invalid API Key.** Re-enter from openrouter.ai/keys');
-              if(r.status===402) return formatAIText('⚠ **Out of credits.** Top up at openrouter.ai');
-            }
-          }catch(fe){continue;}
-          await new Promise(r=>setTimeout(r,800));
-        }
-      }
-      if(text?.trim()){
-        convHistory.push({role:'user',content:userMessage});
-        convHistory.push({role:'assistant',content:text});
-        if(convHistory.length>20) convHistory=convHistory.slice(-20);
-        sysLog('AI: User key ✓','lo');
-        return text;
-      }
-    }catch(e){}
+  // ══ FINAL FALLBACK: Local Knowledge Base ══
+  sysLog('AI: Offline — using built-in knowledge base','lw');
+  if(!storedKey){
+    // No key at all — show KB answer with setup prompt
+    if(kbCtx) return kbCtx + '\n\n---\n> 💡 **Tip:** Set up an API key for full conversational AI responses. Click [⚙ API KEY] in the top right corner and enter a free OpenRouter key from openrouter.ai/keys';
+    return generateFallback(userMessage, systemPrompt);
   }
-
-  // ══ FALLBACK: Local Knowledge Base ══
-  sysLog('AI: Using local KB (offline mode)','lw');
-  if(kbCtx) return kbCtx + '\n\n---\n*ℹ️ **Offline mode** — This response is from the built-in agricultural database. For full AI conversation with Sprayday, please enter your OpenRouter API key by clicking [⚙ API KEY] at the top right.*';
+  // Has key but all methods failed — show KB answer without the nagging message
+  if(kbCtx) return kbCtx;
   return generateFallback(userMessage, systemPrompt);
 }
 
@@ -1297,7 +1350,7 @@ function generateFallback(question, systemPrompt){
     const advice = moisture < 30 ? '⚠️ **Action Required:** Activate the pump immediately. Soil is dangerously dry and plants may be wilting.'
                  : moisture > 70 ? '💧 **Action Required:** Deactivate pump. Excess moisture causes anaerobic conditions and root disease.'
                  : '✅ **Status:** Irrigation system is performing well. Continue monitoring.';
-    return `**📊 Sprayday Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
+    return `**📊 HYDRA-32 Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
   }
 
   const kbCtx = getKBContext(question);
@@ -1370,7 +1423,7 @@ When a user asks how to grow or manage a crop, use these sections:
 
 
 const SENSOR_SYSTEM = `# ROLE
-You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the Sprayday v1.0 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
+You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the HYDRA-32 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
 
 # ABSOLUTE LANGUAGE RULE
 ALWAYS respond in English, regardless of what language the user writes in. This is non-negotiable.
@@ -1934,21 +1987,39 @@ function saveApiKey(){
 
 async function testApiKey(key, statusEl){
   try{
-    // Test with direct API call
     const isAnt = key.startsWith('sk-ant-');
     const isOR  = key.startsWith('sk-or-');
     let resp;
     if(isAnt){
       resp = await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:10,system:'Say OK.',messages:[{role:'user',content:'OK'}]})
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key':key,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body: JSON.stringify({
+          model:'claude-haiku-4-5-20251001',
+          max_tokens:10,
+          system:'You are a test.',
+          messages:[{role:'user',content:'Say OK'}]
+        })
       });
     } else if(isOR){
       resp = await fetch('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://sprayday.local','X-Title':'Sprayday AI'},
-        body: JSON.stringify({model:'mistralai/mistral-7b-instruct:free',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+key,
+          'HTTP-Referer':'https://zzahfa7-sudo.github.io/SprayDay-/',
+          'X-Title':'Sprayday AI'
+        },
+        body: JSON.stringify({
+          model:'mistralai/mistral-7b-instruct',
+          max_tokens:10,
+          messages:[{role:'user',content:'Say OK'}]
+        })
       });
     } else {
       statusEl.className='api-status ok';
@@ -1959,19 +2030,25 @@ async function testApiKey(key, statusEl){
     if(resp && resp.ok){
       statusEl.className='api-status ok';
       statusEl.textContent='✅ Connected! Sprayday AI is fully active!';
-      sysLog('✅ AI key verified and ready','lo');
+      sysLog('✅ AI key verified and active','lo');
       setTimeout(closeApiModal,1800);
     } else {
       const err = await resp.json().catch(()=>({}));
+      const errMsg = err?.error?.message||'HTTP '+resp.status;
       statusEl.className='api-status err';
-      statusEl.textContent='⚠ Key saved but test failed: '+(err?.error?.message||'HTTP '+resp.status)+'. AI will still try on use.';
-      setTimeout(closeApiModal,3000);
+      if(resp.status===401){
+        statusEl.textContent='❌ Invalid key. Please check and re-enter your key from openrouter.ai/keys';
+      } else {
+        statusEl.textContent='⚠ Key saved — test warning: '+errMsg.substring(0,80)+'. AI will still attempt on use.';
+        setTimeout(closeApiModal,3500);
+      }
     }
   }catch(e){
-    // Network test failed — key still saved, will try on first use
+    // CORS/network error during test — key is saved and will work on actual use
     statusEl.className='api-status ok';
-    statusEl.textContent='✓ Key saved. Network test skipped — will activate on first question.';
-    setTimeout(closeApiModal,2500);
+    statusEl.textContent='✓ Key saved successfully. (Connection test skipped — AI will activate on your first question.)';
+    sysLog('Key saved — CORS test skipped, will try on first question','lo');
+    setTimeout(closeApiModal,2800);
   }
 }
 
