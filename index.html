@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>Jababenda Project v1.0 | Sprayday Assistance</title>
+<title>Jababenda Project v1.0 | Sprayday Assistant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -456,7 +456,7 @@ li.ai-li-num::before{content:none}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">&#8209;</div>
+    <div class="logo">JABABENDA&#8209;AGROTECH</div>
     <div class="logo-sub">SPRAYDAY ASSISTANT &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
@@ -566,15 +566,14 @@ li.ai-li-num::before{content:none}
     </div>
     <div class="api-note">
       🆓 <strong style="color:var(--leaf)">Get a FREE API Key at OpenRouter:</strong><br>
-      <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--leaf)">openrouter.ai/keys</a> — <strong style="color:var(--leaf)">GRATIS, tanpa kartu kredit</strong><br><br>
-      <strong>Langkah:</strong><br>
-      1. Buka openrouter.ai → Sign Up (pakai Google/GitHub)<br>
-      2. Klik menu <strong>Keys</strong> → <strong>Create Key</strong><br>
-      3. Copy key yang muncul (format: <code>sk-or-v1-...</code>)<br>
-      4. Paste di sini → Simpan<br><br>
-      Model gratis tersedia: Mistral 7B, Llama 3.1, Gemma 2, Phi-3<br><br>
-      <strong>Steps:</strong> Sign up → Dashboard → Keys → Create Key → Copy key<br><br>
-      OpenRouter gives you access to Claude AI for free (with usage limits).<br>
+      <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--leaf)">openrouter.ai/keys</a> — <strong style="color:var(--leaf)">FREE, no credit card needed</strong><br><br>
+      <strong>Steps:</strong><br>
+      1. Go to openrouter.ai → Sign Up (use Google or GitHub)<br>
+      2. Click <strong>Keys</strong> in the menu → <strong>Create Key</strong><br>
+      3. Copy the key shown (format: <code>sk-or-v1-...</code>)<br>
+      4. Paste it here → Save<br><br>
+      Free models available: Mistral 7B, Llama 3.1, Gemma 2, Phi-3<br><br>
+      OpenRouter gives you access to powerful AI models for free (with usage limits).<br>
       Your key starts with: <span style="color:var(--amber2)">sk-or-v1-...</span><br><br>
       🔒 Your key is stored only in your browser — never sent to any server other than OpenRouter.
     </div>
@@ -598,7 +597,7 @@ li.ai-li-num::before{content:none}
   <div class="sd-shell">
     <div class="sd-top">
       <div class="sd-brand">
-        <div class="sd-wordmark">&#9670; SPRAYDAY AI</div>
+        <div class="sd-wordmark">v1.0 &#9670; SPRAYDAY AI</div>
         <div class="sd-tagline">AGRICULTURAL INTELLIGENCE ASSISTANT</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -661,7 +660,7 @@ li.ai-li-num::before{content:none}
 //  AUTO SETUP — Developer pre-configured API Key
 // ════════════════════════════════════════════════════
 (function(){
-  const DEV_KEY = ''; // Kosongkan — user harus pakai OpenRouter key sendiri
+  const DEV_KEY = ''; // Leave empty — user must use their own OpenRouter key
   // Hapus Gemini key lama jika ada
   const old = localStorage.getItem('sprayday_apikey') || '';
   if(old.startsWith('AIza')){
@@ -721,7 +720,7 @@ const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMs
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
+    sysLog('JABABENDA PROJECT + Sprayday AI v1.0 loaded','lo');
     sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
     renderChips();
@@ -1279,9 +1278,9 @@ async function callClaudeAI(userMessage, systemPrompt){
     }catch(e){}
   }
 
-  // ══ FALLBACK: Knowledge Base lokal ══
-  sysLog('AI: Using local KB','lw');
-  if(kbCtx) return kbCtx + '\n\n---\n*ℹ️ Offline mode — jawaban dari database lokal. Buka via http://localhost atau masukkan API key untuk AI penuh.*';
+  // ══ FALLBACK: Local Knowledge Base ══
+  sysLog('AI: Using local KB (offline mode)','lw');
+  if(kbCtx) return kbCtx + '\n\n---\n*ℹ️ **Offline mode** — This response is from the built-in agricultural database. For full AI conversation with Sprayday, please enter your OpenRouter API key by clicking [⚙ API KEY] at the top right.*';
   return generateFallback(userMessage, systemPrompt);
 }
 
@@ -1298,7 +1297,7 @@ function generateFallback(question, systemPrompt){
     const advice = moisture < 30 ? '⚠️ **Action Required:** Activate the pump immediately. Soil is dangerously dry and plants may be wilting.'
                  : moisture > 70 ? '💧 **Action Required:** Deactivate pump. Excess moisture causes anaerobic conditions and root disease.'
                  : '✅ **Status:** Irrigation system is performing well. Continue monitoring.';
-    return `**📊 HYDRA-32 Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
+    return `**📊 Sprayday Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
   }
 
   const kbCtx = getKBContext(question);
@@ -1311,7 +1310,7 @@ const AGRI_SYSTEM = `# ROLE
 You are SPRAYDAY AI, the world's most advanced Agricultural Intelligence Assistant and expert Agrotech Mentor. Your mission is to provide professional, highly detailed, and deeply informative guidance to farmers and agricultural students at every level, from complete beginners to commercial growers targeting export markets.
 
 # ABSOLUTE LANGUAGE RULE
-ALWAYS respond in the SAME language as the user. If they write in Indonesian (Bahasa Indonesia), reply in Indonesian. If in English, reply in English. Match their language perfectly — this is non-negotiable.
+ALWAYS respond in English, regardless of what language the user writes in. This is non-negotiable. If the user writes in Indonesian or any other language, your response must still be in clear, natural English.
 
 # PERSONALITY AND TONE
 Be conversational and fluid. Avoid robotic or overly formal phrasing. Use natural transitions like 'That's a great question,' 'Let's dig into that,' 'Interestingly,' 'Here's the thing most farmers miss,' and 'Let me walk you through this.' You are a mentor, not a manual.
@@ -1371,10 +1370,10 @@ When a user asks how to grow or manage a crop, use these sections:
 
 
 const SENSOR_SYSTEM = `# ROLE
-You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the HYDRA-32 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
+You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the Sprayday v1.0 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
 
 # ABSOLUTE LANGUAGE RULE
-ALWAYS respond in the SAME language as the user. Indonesian → Indonesian, English → English. This is non-negotiable.
+ALWAYS respond in English, regardless of what language the user writes in. This is non-negotiable.
 
 # PERSONALITY AND TONE
 Be conversational, warm, and mentor-like. Never just read out a number. Explain what it means for the plant, the soil, and what the farmer should do right now and in the next 24 hours.
@@ -1458,17 +1457,17 @@ async function processMessage(input){
       respond(`📊 **REAL-TIME SENSOR DATA**\n\n🌱 **Soil Moisture:** ${moisture}% — ${cond}\n💧 **Water Pump:** ${pump?'🟢 ACTIVE — Running':'⚫ STANDBY — Offline'}\n⚙️ **System Mode:** ${manual?'🔧 MANUAL Override':'🤖 AUTO Control'}\n\n📏 Dry Threshold: 30% | Wet Threshold: 70%\n\n💡 **Recommendation:** ${advice}`);
       return;
     }
-    // Analisis & saran (tanpa AI jika tidak ada key)
+    // Analyze & advise (without AI if no key)
     if(/(analyz|analisi|analy|advise|saran|rekomendasi|advice)/.test(t)){
       const apiKey = localStorage.getItem('sprayday_apikey');
       if(!apiKey){
-        // Fallback analisis lokal
+        // Local sensor analysis fallback
         const cond = moisture<30?'critically dry — immediate irrigation required':moisture>70?'saturated — stop irrigation now':moisture<50?'drying out — irrigation recommended':'optimal — no action needed';
         removeThink(); aiWorking=false;
         respond(`🔍 **SYSTEM ANALYSIS**\n\nSoil moisture is currently **${moisture}%** — ${cond}.\n\n**Pump:** ${pump?'🟢 ACTIVE':'⚫ OFFLINE'} | **Mode:** ${manual?'🔧 MANUAL':'🤖 AUTO'}\n\n${moisture<30?'⚠️ **Action Required:** Activate pump immediately. At this moisture level, plants are under severe water stress and root damage may occur if not irrigated within hours.':moisture>70?'💧 **Action Required:** Deactivate pump. Waterlogged soil reduces oxygen to roots, promotes fungal diseases, and can kill crops within days.':'✅ **System Status:** Everything is running optimally. Your irrigation management is excellent — keep monitoring and maintain this range.'}`);
         return;
       }
-      // Lanjut ke AI jika ada key
+      // Continue to AI if key is available
     }
   }
 
@@ -1935,7 +1934,7 @@ function saveApiKey(){
 
 async function testApiKey(key, statusEl){
   try{
-    // Test dengan proxy Anthropic (tidak kena CORS)
+    // Test with direct API call
     const isAnt = key.startsWith('sk-ant-');
     const isOR  = key.startsWith('sk-or-');
     let resp;
@@ -1969,9 +1968,9 @@ async function testApiKey(key, statusEl){
       setTimeout(closeApiModal,3000);
     }
   }catch(e){
-    // Network error saat test — key tetap tersimpan, coba saat pakai
+    // Network test failed — key still saved, will try on first use
     statusEl.className='api-status ok';
-    statusEl.textContent='✓ Key saved. Network test failed (CORS/offline) — will try on first question.';
+    statusEl.textContent='✓ Key saved. Network test skipped — will activate on first question.';
     setTimeout(closeApiModal,2500);
   }
 }
@@ -1987,7 +1986,7 @@ function updateApiKeyBtn(){
   });
 }
 
-// Cek API key saat load
+// Check API key on page load
 document.addEventListener('DOMContentLoaded',()=>{ updateApiKeyBtn(); });
 window.addEventListener('load',()=>{
   updateApiKeyBtn();
