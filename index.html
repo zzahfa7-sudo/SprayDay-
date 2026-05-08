@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>JABABENDA PROJECT V.1 | Sprayday Assistant</title>
+<title>Jababenda Project v1.0 | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -229,7 +229,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 .cdot.wait{background:var(--amber2);animation:ldPulse 1.4s infinite}
 
 .app-footer{text-align:center;font-size:.5rem;color:var(--t3);opacity:.28;letter-spacing:2px;padding:12px 0}
-.sd-ai-content{font-family:'Space Grotesk',sans-serif;font-size:.83rem;line-height:1.75;color:#d4f5e0}
+.sd-ai-content{font-family:'Space Grotesk',sans-serif;font-size:.83rem;line-height:1.68;color:#d4f5e0}
 .sd-ai-content p{margin:0}
 li.ai-li{position:relative;padding:1px 0 1px 18px;margin:1px 0;color:#d4f5e0;font-size:.82rem;line-height:1.55;list-style:none}
 li.ai-li::before{content:'▸';position:absolute;left:0;color:#2dff7a;font-size:.75rem;top:4px}
@@ -447,7 +447,7 @@ li.ai-li-num::before{content:none}
     <div class="ls-r ls-r3"></div><div class="ls-r ls-r4"></div>
     <div class="ls-core">🌿</div>
   </div>
-  <div class="ls-title">Sprayday Assistance</div>
+  <div class="ls-title">Sprayday Assistant</div>
   <div class="ls-tag">AI-POWERED AGRICULTURAL SYSTEM</div>
   <div class="ls-track"><div class="ls-fill"></div></div>
   <div class="ls-msg" id="lsMsg">INITIALIZING...</div>
@@ -456,8 +456,8 @@ li.ai-li-num::before{content:none}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">SPRAYDAY&#8209;ASSISTANT</div>
-    <div class="logo-sub">POWERED BY AI &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
+    <div class="logo">&#8209;</div>
+    <div class="logo-sub">SPRAYDAY ASSISTANT &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
       <div class="live-pill"><span class="live-dot"></span><span id="liveLabel">CONNECTING...</span></div>
@@ -550,7 +550,7 @@ li.ai-li-num::before{content:none}
     <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-  <div class="app-footer">SPRAYDAY PROJECT // SPRAYDAY ASSISTANT // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+  <div class="app-footer">JABABENDA PROJECT // SPRAYDAY ASSISTANT // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
 </div>
 
 <!-- ═══════════════ API KEY MODAL ═══════════════ -->
@@ -566,7 +566,13 @@ li.ai-li-num::before{content:none}
     </div>
     <div class="api-note">
       🆓 <strong style="color:var(--leaf)">Get a FREE API Key at OpenRouter:</strong><br>
-      <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--leaf)">openrouter.ai/keys</a><br><br>
+      <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--leaf)">openrouter.ai/keys</a> — <strong style="color:var(--leaf)">GRATIS, tanpa kartu kredit</strong><br><br>
+      <strong>Langkah:</strong><br>
+      1. Buka openrouter.ai → Sign Up (pakai Google/GitHub)<br>
+      2. Klik menu <strong>Keys</strong> → <strong>Create Key</strong><br>
+      3. Copy key yang muncul (format: <code>sk-or-v1-...</code>)<br>
+      4. Paste di sini → Simpan<br><br>
+      Model gratis tersedia: Mistral 7B, Llama 3.1, Gemma 2, Phi-3<br><br>
       <strong>Steps:</strong> Sign up → Dashboard → Keys → Create Key → Copy key<br><br>
       OpenRouter gives you access to Claude AI for free (with usage limits).<br>
       Your key starts with: <span style="color:var(--amber2)">sk-or-v1-...</span><br><br>
@@ -617,7 +623,7 @@ li.ai-li-num::before{content:none}
 
     <!-- Mode selector -->
     <div class="chat-modes">
-      <button class="cmode-btn active-sensor" id="btnSensor" onclick="setMode('sensor')">📊 Sensor Control</button>
+      <button class="cmode-btn active-sensor" id="btnSensor" onclick="setMode('sensor')">📊 System Control</button>
       <button class="cmode-btn inactive" id="btnAgri" onclick="setMode('agri')">🌾 Sprayday AI</button>
     </div>
 
@@ -1147,75 +1153,138 @@ function getKBContext(question){
   return matches.length ? matches[0] : null; // Return most relevant KB entry
 }
 
-async function callClaudeAI(userMessage, systemPrompt){
-  const apiKey = localStorage.getItem('sprayday_apikey');
-  if(!apiKey){
-    return generateFallback(userMessage, systemPrompt);
+// ─────────────────────────────────────────────────
+// Detect API key type and call the right endpoint
+// ─────────────────────────────────────────────────
+// ════════════════════════════════════════════════════
+//  AI ENGINE — Multi-layer: Artifact Proxy → KB Local
+// ════════════════════════════════════════════════════
+let pendingAIResolve = null;
+let aiRequestId = 0;
+
+// Listen untuk respons dari Artifact proxy
+window.addEventListener('message', (event) => {
+  if(event.data?.type === 'ai_response' && pendingAIResolve){
+    const resolve = pendingAIResolve;
+    pendingAIResolve = null;
+    resolve(event.data.text || null);
   }
+});
 
-  // Build full conversation for this call
-  convHistory.push({role:'user', content: userMessage});
-  if(convHistory.length > 30) convHistory = convHistory.slice(-30);
+async function callViaArtifact(systemPrompt, messages){
+  return new Promise((resolve) => {
+    const id = ++aiRequestId;
+    pendingAIResolve = resolve;
+    // Kirim ke parent (Claude.ai Artifact host) via postMessage
+    window.parent.postMessage({
+      type: 'ai_request',
+      id: id,
+      model: 'claude-haiku-4-5',
+      system: systemPrompt,
+      messages: messages,
+      max_tokens: 1000
+    }, '*');
+    // Timeout 15 detik
+    setTimeout(() => {
+      if(pendingAIResolve === resolve){
+        pendingAIResolve = null;
+        resolve(null);
+      }
+    }, 15000);
+  });
+}
 
-  // Enrich system prompt with KB context if relevant
+async function callClaudeAI(userMessage, systemPrompt){
   const kbCtx = getKBContext(userMessage);
   const enrichedSystem = kbCtx
-    ? systemPrompt + '\n\n--- REFERENCE KNOWLEDGE (use this to enhance your answer, but always expand with your own expertise and write in a natural conversational way) ---\n' + kbCtx
+    ? systemPrompt + '\n\n[KNOWLEDGE BASE CONTEXT — integrate naturally into answer]\n' + kbCtx
     : systemPrompt;
+  const msgs = [...convHistory.slice(-8), {role:'user', content: userMessage}];
 
-  // Full messages array: system + history
-  const messages = [
-    { role: 'system', content: enrichedSystem },
-    ...convHistory
-  ];
-
+  // ══ METHOD 1: Direct Anthropic fetch (works from http://localhost) ══
   try{
-    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey,
-        'HTTP-Referer': window.location.href,
-        'X-Title': 'Sprayday AI Agricultural Assistant'
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
       },
-      body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4-5',
-        max_tokens: 2500,
-        temperature: 0.7,
-        messages: messages
-      })
+      body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:1000,system:enrichedSystem,messages:msgs})
     });
-
-    if(!resp.ok){
-      const errData = await resp.json().catch(()=>({}));
-      const errMsg = errData?.error?.message || 'HTTP ' + resp.status;
-      console.warn('OpenRouter error:', errMsg);
-      // Show specific error to user
-      if(resp.status === 401) return '**API Key Error:** Your API key appears to be invalid or expired. Please click the API KEY button and enter a valid OpenRouter key from openrouter.ai/keys';
-      if(resp.status === 402) return '**Credit Limit:** Your OpenRouter account has run out of credits. Please top up at openrouter.ai to continue using AI responses.';
-      if(resp.status === 429) return '**Rate Limited:** Too many requests. Please wait a moment and try again.';
-      throw new Error(errMsg);
+    if(resp.ok){
+      const data = await resp.json();
+      const text = data?.content?.[0]?.text;
+      if(text?.trim()){
+        convHistory.push({role:'user',content:userMessage});
+        convHistory.push({role:'assistant',content:text});
+        if(convHistory.length>20) convHistory=convHistory.slice(-20);
+        sysLog('AI: Anthropic direct ✓','lo');
+        return text;
+      }
     }
+  }catch(e){ /* coba method berikutnya */ }
 
-    const data = await resp.json();
-    const text = data?.choices?.[0]?.message?.content;
-
-    if(text && text.trim()){
-      convHistory.push({role:'assistant', content: text});
-      if(convHistory.length > 30) convHistory = convHistory.slice(-30);
+  // ══ METHOD 2: Artifact proxy via postMessage (works inside Claude.ai) ══
+  try{
+    const text = await callViaArtifact(enrichedSystem, msgs);
+    if(text?.trim()){
+      convHistory.push({role:'user',content:userMessage});
+      convHistory.push({role:'assistant',content:text});
+      if(convHistory.length>20) convHistory=convHistory.slice(-20);
+      sysLog('AI: Artifact proxy ✓','lo');
       return text;
     }
-    throw new Error('Empty response from AI');
+  }catch(e){ /* coba method berikutnya */ }
 
-  } catch(e){
-    console.warn('AI call failed:', e.message);
-    sysLog('AI error: ' + e.message, 'le');
-    // Only use fallback if it's a network/fetch error, not an API error
-    const kbResult = getKBContext(userMessage);
-    if(kbResult) return kbResult + '\n\n*Note: AI connection failed — showing cached knowledge. Check your API key and internet connection.*';
-    return generateFallback(userMessage, systemPrompt);
+  // ══ METHOD 3: OpenRouter dengan key user ══
+  const storedKey = localStorage.getItem('sprayday_apikey')||'';
+  if(storedKey.startsWith('sk-or-') || storedKey.startsWith('sk-ant-')){
+    try{
+      let text = null;
+      if(storedKey.startsWith('sk-ant-')){
+        const r = await fetch('https://api.anthropic.com/v1/messages',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':storedKey,
+            'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:1000,system:enrichedSystem,messages:msgs})
+        });
+        if(r.ok){const d=await r.json();text=d?.content?.[0]?.text;}
+      } else {
+        for(const model of ['mistralai/mistral-7b-instruct:free','meta-llama/llama-3.1-8b-instruct:free','google/gemma-2-9b-it:free']){
+          try{
+            const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+              method:'POST',
+              headers:{'Content-Type':'application/json','Authorization':'Bearer '+storedKey,
+                'HTTP-Referer':'https://sprayday.local','X-Title':'Sprayday AI'},
+              body:JSON.stringify({model,max_tokens:1000,temperature:0.7,
+                messages:[{role:'system',content:enrichedSystem},...msgs]})
+            });
+            if(r.ok){const d=await r.json();text=d?.choices?.[0]?.message?.content;if(text)break;}
+            else{const e=await r.json().catch(()=>({}));
+              if(r.status===401) return formatAIText('⚠ **Invalid API Key.** Re-enter from openrouter.ai/keys');
+              if(r.status===402) return formatAIText('⚠ **Out of credits.** Top up at openrouter.ai');
+            }
+          }catch(fe){continue;}
+          await new Promise(r=>setTimeout(r,800));
+        }
+      }
+      if(text?.trim()){
+        convHistory.push({role:'user',content:userMessage});
+        convHistory.push({role:'assistant',content:text});
+        if(convHistory.length>20) convHistory=convHistory.slice(-20);
+        sysLog('AI: User key ✓','lo');
+        return text;
+      }
+    }catch(e){}
   }
+
+  // ══ FALLBACK: Knowledge Base lokal ══
+  sysLog('AI: Using local KB','lw');
+  if(kbCtx) return kbCtx + '\n\n---\n*ℹ️ Offline mode — jawaban dari database lokal. Buka via http://localhost atau masukkan API key untuk AI penuh.*';
+  return generateFallback(userMessage, systemPrompt);
 }
+
 
 function generateFallback(question, systemPrompt){
   const q = question.toLowerCase();
@@ -1238,45 +1307,58 @@ function generateFallback(question, systemPrompt){
   return `I'm here to help with all your farming questions! I can provide detailed guidance on:\n\n🌾 **Crop Cultivation:** Rice, coffee, chili, onion, corn, palm oil, cocoa, and more\n💊 **Fertilization:** NPK recommendations, organic options, application timing\n🐛 **Pest & Disease Control:** Identification, treatment, and prevention\n💧 **Irrigation:** Scheduling, methods, water requirements by crop\n📅 **Farm Planning:** Seasonal calendars, crop rotation, market timing\n\nJust ask me anything — whether you're starting a new farm or solving a specific problem!`;
 }
 
-const AGRI_SYSTEM = `You are Sprayday AI — a world-class agricultural mentor with 25+ years of hands-on tropical farming experience. You are simultaneously a senior agronomist, soil scientist, plant pathologist, and farm business consultant who genuinely cares about helping every farmer succeed.
+const AGRI_SYSTEM = `# ROLE
+You are SPRAYDAY AI, the world's most advanced Agricultural Intelligence Assistant and expert Agrotech Mentor. Your mission is to provide professional, highly detailed, and deeply informative guidance to farmers and agricultural students at every level, from complete beginners to commercial growers targeting export markets.
 
-ABSOLUTE LANGUAGE RULE: ALWAYS RESPOND IN ENGLISH. No exceptions. Even if the user writes in Indonesian, Malay, or any other language — your response is always in English. This is a hard requirement.
+# ABSOLUTE LANGUAGE RULE
+ALWAYS respond in the SAME language as the user. If they write in Indonesian (Bahasa Indonesia), reply in Indonesian. If in English, reply in English. Match their language perfectly — this is non-negotiable.
 
-YOUR CORE MISSION: When a farmer asks you something, give them the COMPLETE answer — not a summary, not a teaser, not bullet points that say nothing. Give them the full picture: the process, the exact numbers, the common mistakes, the pro tips, and what to do next. A farmer reading your answer should feel like they just had a 30-minute consultation with the best agronomist in the country.
+# PERSONALITY AND TONE
+Be conversational and fluid. Avoid robotic or overly formal phrasing. Use natural transitions like 'That's a great question,' 'Let's dig into that,' 'Interestingly,' 'Here's the thing most farmers miss,' and 'Let me walk you through this.' You are a mentor, not a manual.
 
-EXPERTISE: You know every tropical crop inside out — rice, coffee, chili, red onion, corn, palm oil, cocoa, rubber, cassava, sweet potato, banana, mango, durian, watermelon, melon, tomato, eggplant, soybean, peanut, and dozens more. You know soil science, fertilizer chemistry, plant nutrition, pest & disease management (IPM), post-harvest handling, export standards, and farm economics.
+Have a mentorship mindset. Never just give a bare answer. Explain the WHY behind every recommendation. Guide the user through the logic so they understand the principle and can apply it independently next time.
 
-STRICT RESPONSE RULES — ALL MUST BE FOLLOWED:
+Be professional yet accessible. Use proper agronomic terminology (nitrogen fixation, cation exchange capacity, DAT, IPM, etc.) but explain those terms naturally in context when the user might need clarity.
 
-RULE 1 — WRITE DETAILED, COMPREHENSIVE ANSWERS.
-Every farming question deserves a thorough answer. Cover the full picture: process steps, exact doses (g/L, kg/ha), timing (DAT = days after transplanting), spacing (cm), expected yield (tons/ha), cost estimates, common mistakes, and what to do next. Short vague answers are useless to real farmers. Aim for responses that fully equip the farmer to take action.
+Be encouraging and proactive. After answering a question about a specific crop, always offer a related insight or tip (pest timing, irrigation cue, soil prep trick) to keep the mentoring conversation flowing forward.
 
-RULE 2 — BE WARM AND CONVERSATIONAL, NOT ROBOTIC.
-You are a mentor, not a manual. Use natural language: "Here is the thing most farmers get wrong...", "Let me walk you through this step by step...", "The single most important thing here is...", "A pro tip that really works in the field is...", "Do not make the mistake of..."
+Never be dismissive. If a user has made a mistake in their farming logic, correct them gently and kindly, the way a great mentor would.
 
-RULE 3 — GIVE EXACT NUMBERS ALWAYS.
-Never say "apply fertilizer" — say "apply 150 kg/ha of Urea split across 3 applications: 50 kg at planting, 75 kg at 14 DAT, and 25 kg at 28 DAT."
-Never say "water regularly" — say "irrigate every 2-3 days, targeting 55-65% soil moisture on your HYDRA-32 sensor."
-Never say "harvest when mature" — say "harvest at 75-90 DAT when 80% of fruit has turned red for fresh market, or fully red for export."
+# KNOWLEDGE DOMAINS
+**Crop Management:** Deep expertise in Rice, Coffee, Chili, Red Onion, Corn, and all other tropical and subtropical crops. You know every stage: land prep, variety selection, transplanting, fertilization schedules, water management, pest and disease control, harvest timing, and post-harvest handling.
 
-RULE 4 — USE CLEAR STRUCTURE WITH HEADERS AND SECTIONS.
-For detailed crop or technique questions, organize your answer with ## section headers. Use bullet points for lists. Use tables for comparisons, schedules, or dosage information. This makes the answer easy to follow and act on.
+**Soil Science:** Complete mastery of NPK nutrient management, soil pH and its effects on nutrient availability, soil texture and structure, organic matter, cation exchange capacity, soil moisture interpretation, drainage, and microbiome health.
 
-RULE 5 — ALWAYS LEAD INTO THE NEXT LOGICAL STEP.
-After answering the main question, naturally guide the farmer forward: "Now that you understand land preparation, here is what to focus on during the first two weeks after planting..." This makes the conversation feel like a real mentoring session.
+**Sustainable Practices:** Expert in crop rotation (breaking disease and pest cycles), intercropping systems (e.g., banana or lamtoro for shade and nitrogen fixation with coffee), cover cropping, composting, biological pest control, and reduced-chemical IPM strategies.
 
-RULE 6 — INCLUDE FIELD WISDOM IN EVERY ANSWER.
-Share practical insights beyond the textbook: what signs to watch for in the field (leaf color, root smell, soil texture), beginner mistakes that cost money, tricks that experienced farmers use, and what export buyers actually look for.
+**Tech Integration:** Fully conversant in IoT in agriculture: ESP32/Arduino sensor systems, soil moisture sensors, automated irrigation logic, threshold-based pump control, HYDRA-32 sensor data interpretation, and smart farm management systems.
 
-RULE 7 — EXPORT-QUALITY MINDSET.
-When relevant, always mention what extra steps achieve export-grade results. Export produce earns 30-80% more than local market prices. Help farmers see this opportunity and what it takes.
+**Farm Economics:** Able to discuss cost-per-hectare analysis, yield targets, market timing, export quality standards (grading, sizing, moisture content, packaging), price premiums, and how to make farming profitable at scale.
 
-RULE 8 — USE LIVE SENSOR DATA WHEN RELEVANT.
-Current HYDRA-32 reading: soil moisture is MOISTURE_PLACEHOLDER%, pump is PUMP_PLACEHOLDER, mode is MODE_PLACEHOLDER. When discussing irrigation or crop water needs, reference this actual live reading and explain what it means for their crops right now.
+# LIVE SENSOR DATA (HYDRA-32 System)
+Current soil moisture reading: MOISTURE_PLACEHOLDER%
+Water pump status: PUMP_PLACEHOLDER
+System mode: MODE_PLACEHOLDER
 
-RESPONSE STRUCTURE FOR CROP GROWING QUESTIONS:
-When someone asks how to grow or manage a crop, always cover these sections:
-## Why This Crop and What to Expect
+Moisture guide: 0-30% = CRITICAL DRY (irrigate now), 30-50% = DRY (irrigate within 24hr), 50-70% = OPTIMAL, 70-85% = WET (hold irrigation), 85-100% = SATURATED (stop pump, root rot risk).
+
+When irrigation or water management comes up, always reference the actual live sensor reading and explain what it means for the user's crops right now.
+
+# RESPONSE FORMAT
+Use ## headers to organize longer answers. Use bullet points with information-dense lines. Bold key terms, crop names, and critical thresholds.
+
+Use these callout formats:
+- 💡 **Key Rule:** for fundamental farming principles the user must never forget
+- 🛠 **Tech Tip:** for IoT, sensor, or automation advice
+- ⚠ **Warning:** for common mistakes that cost farmers money or yield
+- ✅ **Pro Tip:** for advanced techniques used by experienced growers
+
+# RESPONSE DEPTH REQUIREMENT
+Every answer must be COMPLETE and ACTIONABLE. Give the full picture: exact doses in kg/ha or g/L, timing in DAT, exact spacing in cm, expected yield ranges in tons/ha, named product recommendations, and step-by-step processes. After answering, always guide the user to their next logical step.
+
+# RESPONSE STRUCTURE FOR CROP QUESTIONS
+When a user asks how to grow or manage a crop, use these sections:
+## Overview and Why This Crop Is Worth Growing
 ## Choosing the Right Variety
 ## Land Preparation
 ## Planting Guide
@@ -1288,31 +1370,29 @@ When someone asks how to grow or manage a crop, always cover these sections:
 ## Your Next Steps`
 
 
-const SENSOR_SYSTEM = `You are Sprayday AI — an expert agricultural mentor integrated with the HYDRA-32 precision irrigation system. You combine deep agronomy knowledge with real-time soil sensor data to give farmers smart, specific, actionable irrigation guidance.
+const SENSOR_SYSTEM = `# ROLE
+You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the HYDRA-32 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
 
-ABSOLUTE LANGUAGE RULE: ALWAYS RESPOND IN ENGLISH. No exceptions whatsoever.
+# ABSOLUTE LANGUAGE RULE
+ALWAYS respond in the SAME language as the user. Indonesian → Indonesian, English → English. This is non-negotiable.
 
-LIVE HYDRA-32 SENSOR DATA RIGHT NOW:
-- Soil moisture: MOISTURE_PLACEHOLDER% (0% = bone dry, 100% = fully saturated)
-- Water pump: PUMP_PLACEHOLDER
-- System mode: MODE_PLACEHOLDER
-- Automatic thresholds: Pump ON below 30%, Pump OFF above 70%
+# PERSONALITY AND TONE
+Be conversational, warm, and mentor-like. Never just read out a number. Explain what it means for the plant, the soil, and what the farmer should do right now and in the next 24 hours.
 
-SENSOR READING INTERPRETATION:
-- 0-30%: CRITICAL — plants are approaching wilting point, activate pump immediately
-- 30-50%: DRY — soil is drying out, irrigate within 12-24 hours
-- 50-70%: OPTIMAL — ideal moisture range for most tropical crops
-- 70-85%: WET — soil is near field capacity, hold irrigation
-- 85-100%: SATURATED — stop pump immediately, risk of root rot and anaerobic conditions
+# LIVE SENSOR DATA
+Current soil moisture: MOISTURE_PLACEHOLDER%
+Water pump status: PUMP_PLACEHOLDER
+System mode: MODE_PLACEHOLDER
+Auto thresholds: Pump ON below 30% | Pump OFF above 70%
 
-HOW YOU RESPOND IN SENSOR MODE:
-- Always start by stating the current live moisture reading and what it means
-- Give a clear, specific recommendation based on the reading (activate pump / hold / monitor)
-- Explain WHY that moisture level matters biologically — what is happening to the plant roots right now
-- If the user mentions a specific crop, tailor your advice to that crop exact water requirements
-- After the immediate recommendation, guide them on what to watch for next
-- Be warm and mentor-like, not robotic or clinical
-- Write detailed, useful paragraphs — not one-line answers`
+Interpretation: 0-30% = CRITICAL (activate pump now), 30-50% = DRY (irrigate within 12-24hr), 50-70% = OPTIMAL, 70-85% = WET (hold irrigation), 85-100% = SATURATED (stop pump, root rot risk).
+
+# HOW TO RESPOND
+Always start by stating the actual moisture reading and what it means biologically. Give a clear, specific recommendation. If a crop is mentioned, tailor advice to that crop's water needs at its current growth stage. After the immediate advice, guide the user on what to monitor over the next 24-48 hours.
+
+Use 🛠 **Tech Tip:** for sensor or automation advice.
+Use 💡 **Key Rule:** for fundamental irrigation principles.
+Use ⚠ **Warning:** when the moisture level poses a risk to the crop.`
 
 
 function getSensorContext(sys){
@@ -1397,19 +1477,32 @@ async function processMessage(input){
     const systemPrompt = getSensorContext(chatMode==='agri' ? AGRI_SYSTEM : SENSOR_SYSTEM);
     const response = await callClaudeAI(input, systemPrompt);
     removeThink();
-    respond(response);
+    if(response !== null){ // null means error already displayed inline
+      const htmlContent = formatAIText(response);
+      addAI(htmlContent, true);
+      // TTS: first 300 chars, plain text
+      const plain = response.replace(/[#*`_~>]/g,'').replace(/\n+/g,' ').trim();
+      speak(plain.substring(0, 300));
+    }
   }catch(e){
     removeThink();
-    respond('❌ An unexpected error occurred. Please try again in a moment.');
+    addAI(formatAIText('Something went wrong on my end. Please try again — I\'m ready to help!'), false);
+    console.error('processMessage error:', e);
   }finally{
     aiWorking = false;
-    setStat('READY TO ASSIST','');
+    setStat('READY','');
   }
 }
 
-function respond(text){
-  addAI(formatAIText(text));
-  speak(text);
+function respond(rawText){
+  // If rawText is already formatted HTML (starts with < or contains div), use as-is
+  // Otherwise format it
+  const isHTML = rawText && (rawText.startsWith('<') || rawText.includes('<div') || rawText.includes('<p '));
+  const htmlContent = isHTML ? rawText : formatAIText(rawText);
+  addAI(htmlContent, true);
+  // Speak the plain text version (strip HTML tags)
+  const plainText = rawText.replace(/<[^>]+>/g,'').replace(/\*+/g,'').trim();
+  speak(plainText.substring(0, 300)); // limit TTS to first 300 chars
 }
 
 function runCmd(cmd){addUser(cmd);processMessage(cmd);}
@@ -1739,12 +1832,44 @@ function addUser(t){
   d.innerHTML=`<div class="mlbl">YOU</div><div class="mbub">${escHtml(t)}</div>`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
-function addAI(t){
+function addAI(htmlContent, animate){
   removeThink();
-  const c=document.getElementById('sdChat');
-  const d=document.createElement('div');d.className='msg a';
-  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub sd-ai-content">${t}</div>`;
-  c.appendChild(d);c.scrollTop=c.scrollHeight;
+  const c = document.getElementById('sdChat');
+  const d = document.createElement('div');
+  d.className = 'msg a';
+  const bubble = document.createElement('div');
+  bubble.className = 'mbub sd-ai-content';
+  d.innerHTML = '<div class="mlbl">SPRAYDAY AI</div>';
+  d.appendChild(bubble);
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+
+  // Typewriter-style reveal using requestAnimationFrame
+  // We inject the HTML progressively by revealing characters
+  if(animate !== false && htmlContent.length > 0){
+    const fullHTML = htmlContent;
+    let pos = 0;
+    const chunkSize = 8; // chars per frame — adjust for speed
+    const total = fullHTML.length;
+
+    function typeChunk(){
+      if(pos < total){
+        pos = Math.min(pos + chunkSize, total);
+        // We need to set innerHTML progressively but HTML tags must be complete
+        // Strategy: reveal raw text chars, but keep HTML tags intact
+        bubble.innerHTML = fullHTML.substring(0, pos);
+        c.scrollTop = c.scrollHeight;
+        requestAnimationFrame(typeChunk);
+      } else {
+        bubble.innerHTML = fullHTML; // final clean state
+        c.scrollTop = c.scrollHeight;
+      }
+    }
+    requestAnimationFrame(typeChunk);
+  } else {
+    bubble.innerHTML = htmlContent;
+    c.scrollTop = c.scrollHeight;
+  }
 }
 function showThink(){
   removeThink();
@@ -1796,7 +1921,8 @@ function saveApiKey(){
   if(!v){
     st.className='api-status err';st.textContent='❌ API Key cannot be empty.';st.style.display='block';return;
   }
-  if(!v.startsWith('sk-or-') && !v.startsWith('sk-ant-')){
+  const validKey = v.startsWith('sk-or-') || v.startsWith('sk-ant-');
+  if(!validKey){
     st.className='api-status err';st.textContent='❌ Invalid key format. Key must start with sk-or- (OpenRouter) or sk-ant- (Anthropic)';st.style.display='block';return;
   }
   localStorage.setItem('sprayday_apikey',v);
@@ -1809,38 +1935,47 @@ function saveApiKey(){
 
 async function testApiKey(key, statusEl){
   try{
-    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+key,
-        'HTTP-Referer': window.location.href,
-        'X-Title': 'Sprayday AI'
-      },
-      body: JSON.stringify({
-        model:'anthropic/claude-sonnet-4-5',
-        max_tokens: 30,
-        messages:[{role:'system',content:'You are Sprayday AI.'},{role:'user',content:'Say OK'}]
-      })
-    });
-    if(resp.ok){
+    // Test dengan proxy Anthropic (tidak kena CORS)
+    const isAnt = key.startsWith('sk-ant-');
+    const isOR  = key.startsWith('sk-or-');
+    let resp;
+    if(isAnt){
+      resp = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body: JSON.stringify({model:'claude-haiku-4-5',max_tokens:10,system:'Say OK.',messages:[{role:'user',content:'OK'}]})
+      });
+    } else if(isOR){
+      resp = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://sprayday.local','X-Title':'Sprayday AI'},
+        body: JSON.stringify({model:'mistralai/mistral-7b-instruct:free',max_tokens:10,messages:[{role:'user',content:'Say OK'}]})
+      });
+    } else {
       statusEl.className='api-status ok';
-      statusEl.textContent='✅ Connection successful! Sprayday AI is ready. You can start asking farming questions.';
-      sysLog('✅ AI connection verified — Sprayday AI ready','lo');
-      setTimeout(closeApiModal,2000);
+      statusEl.textContent='✓ Key saved. Will validate on first use.';
+      setTimeout(closeApiModal,1800);
+      return;
+    }
+    if(resp && resp.ok){
+      statusEl.className='api-status ok';
+      statusEl.textContent='✅ Connected! Sprayday AI is fully active!';
+      sysLog('✅ AI key verified and ready','lo');
+      setTimeout(closeApiModal,1800);
     } else {
       const err = await resp.json().catch(()=>({}));
       statusEl.className='api-status err';
-      statusEl.textContent='⚠ Key saved but connection test failed: ' + (err?.error?.message||'HTTP '+resp.status) + '. You can still try using the AI.';
-      sysLog('API key saved but test failed: '+(err?.error?.message||resp.status),'lw');
+      statusEl.textContent='⚠ Key saved but test failed: '+(err?.error?.message||'HTTP '+resp.status)+'. AI will still try on use.';
       setTimeout(closeApiModal,3000);
     }
-  } catch(e){
+  }catch(e){
+    // Network error saat test — key tetap tersimpan, coba saat pakai
     statusEl.className='api-status ok';
-    statusEl.textContent='✓ Key saved. Could not test connection (network issue) — try asking a question.';
-    setTimeout(closeApiModal,2000);
+    statusEl.textContent='✓ Key saved. Network test failed (CORS/offline) — will try on first question.';
+    setTimeout(closeApiModal,2500);
   }
 }
+
 
 function updateApiKeyBtn(){
   const hasKey=!!localStorage.getItem('sprayday_apikey');
