@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>HYDRA-32 | Sprayday Assistance</title>
+<title>JABABENDA PROJECT V.1 | Sprayday Assistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -229,6 +229,14 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 .cdot.wait{background:var(--amber2);animation:ldPulse 1.4s infinite}
 
 .app-footer{text-align:center;font-size:.5rem;color:var(--t3);opacity:.28;letter-spacing:2px;padding:12px 0}
+.sd-ai-content{font-family:'Space Grotesk',sans-serif;font-size:.83rem;line-height:1.75;color:#d4f5e0}
+.sd-ai-content p{margin:0}
+li.ai-li{position:relative;padding:1px 0 1px 18px;margin:1px 0;color:#d4f5e0;font-size:.82rem;line-height:1.55;list-style:none}
+li.ai-li::before{content:'▸';position:absolute;left:0;color:#2dff7a;font-size:.75rem;top:4px}
+li.ai-li-sub{padding-left:32px;color:#6fa882;font-size:.78rem}
+li.ai-li-sub::before{content:'◦';color:#6fa882}
+li.ai-li-num{padding-left:20px;counter-increment:none}
+li.ai-li-num::before{content:none}
 
 /* ═══ FAB ═══ */
 #fab{position:fixed;bottom:calc(22px + var(--sp));right:18px;z-index:200;
@@ -383,10 +391,10 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 @keyframes nIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 
 /* ═══ API KEY MODAL ═══ */
-#apiModal{display:none;position:fixed;inset:0;z-index:9500;
+#apiModal{position:fixed;inset:0;z-index:9500;
   background:rgba(1,6,2,.96);backdrop-filter:blur(18px);
-  align-items:center;justify-content:center}
-#apiModal.open{display:flex}
+  display:none;align-items:center;justify-content:center}
+#apiModal.open{display:flex!important}
 .api-box{background:var(--bg3);border:1px solid var(--leaf);border-radius:6px;
   padding:32px 28px;max-width:420px;width:90%;position:relative}
 .api-box::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
@@ -419,7 +427,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
   border:1px solid rgba(255,51,85,.2)}
 .api-key-btn{font-family:var(--title);font-size:.48rem;font-weight:700;letter-spacing:1.5px;
   padding:5px 10px;border-radius:2px;border:1px solid rgba(45,255,122,.3);color:rgba(45,255,122,.6);
-  background:rgba(45,255,122,.03);cursor:pointer;transition:all .3s}
+  background:rgba(45,255,122,.03);cursor:pointer;transition:all .3s;white-space:nowrap}
 .api-key-btn:hover{border-color:var(--leaf);color:var(--leaf);}
 .api-key-btn.set{border-color:var(--leaf);color:var(--leaf);background:rgba(45,255,122,.06)}
 </style>
@@ -448,8 +456,8 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 <!-- ═══════════════ APP ═══════════════ -->
 <div id="app">
   <div class="hdr">
-    <div class="logo">HYDRA&#8209;32</div>
-    <div class="logo-sub">SPRAYDAY ASSISTANCE &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
+    <div class="logo">SPRAYDAY&#8209;ASSISTANCE</div>
+    <div class="logo-sub">POWERED BY AI &nbsp;&#47;&#47;&nbsp; AI AGRICULTURAL IRRIGATION SYSTEM</div>
     <div class="hline"></div>
     <div class="hdr-row">
       <div class="live-pill"><span class="live-dot"></span><span id="liveLabel">CONNECTING...</span></div>
@@ -542,26 +550,27 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-  <div class="app-footer">HYDRA-32 // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+  <div class="app-footer">SPRAYDAY PROJECT // SPRAYDAY ASSISTANCE // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
 </div>
 
 <!-- ═══════════════ API KEY MODAL ═══════════════ -->
 <div id="apiModal">
   <div class="api-box">
-    <div class="api-title">⚙ GOOGLE GEMINI API KEY</div>
-    <div class="api-sub">Masukkan API Key Google Gemini — <strong style="color:var(--leaf)">GRATIS 1500 request/hari</strong>. Tidak perlu kartu kredit!</div>
+    <div class="api-title">⚙ OPENROUTER API KEY</div>
+    <div class="api-sub">Enter your <strong style="color:var(--leaf)">OpenRouter API Key — FREE</strong> to unlock powerful AI responses for all your farming questions!</div>
     <div class="api-status" id="apiStatus"></div>
-    <input class="api-inp" id="apiInp" type="password" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"/>
+    <input class="api-inp" id="apiInp" type="password" placeholder="sk-or-v1-..." autocomplete="off" spellcheck="false"/>
     <div class="api-btns">
-      <button class="api-save" onclick="saveApiKey()">✓ SIMPAN & AKTIFKAN</button>
-      <button class="api-cancel" onclick="closeApiModal()">BATAL</button>
+      <button class="api-save" onclick="saveApiKey()">✓ SAVE & ACTIVATE</button>
+      <button class="api-cancel" onclick="closeApiModal()">CANCEL</button>
     </div>
     <div class="api-note">
-      🆓 Dapatkan API Key GRATIS di:<br>
-      <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a><br><br>
-      Langkah: Login Google → "Get API Key" → "Create API Key" → Copy<br>
-      API Key disimpan di browser lokal Anda, aman &amp; tidak dikirim ke server lain.<br>
-      Format: <span style="color:var(--t2)">AIzaSy...</span>
+      🆓 <strong style="color:var(--leaf)">Get a FREE API Key at OpenRouter:</strong><br>
+      <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--leaf)">openrouter.ai/keys</a><br><br>
+      <strong>Steps:</strong> Sign up → Dashboard → Keys → Create Key → Copy key<br><br>
+      OpenRouter gives you access to Claude AI for free (with usage limits).<br>
+      Your key starts with: <span style="color:var(--amber2)">sk-or-v1-...</span><br><br>
+      🔒 Your key is stored only in your browser — never sent to any server other than OpenRouter.
     </div>
   </div>
 </div>
@@ -609,7 +618,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
     <!-- Mode selector -->
     <div class="chat-modes">
       <button class="cmode-btn active-sensor" id="btnSensor" onclick="setMode('sensor')">📊 Sensor Control</button>
-      <button class="cmode-btn inactive" id="btnAgri" onclick="setMode('agri')">🌾 Agriculture AI</button>
+      <button class="cmode-btn inactive" id="btnAgri" onclick="setMode('agri')">🌾 Sprayday AI</button>
     </div>
 
     <div class="sd-chat" id="sdChat"></div>
@@ -619,7 +628,7 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 
     <!-- Text input row -->
     <div class="sd-input-row">
-      <textarea class="sd-input" id="sdInput" placeholder="Type your question... (e.g. How do I grow coffee?)"
+      <textarea class="sd-input" id="sdInput" placeholder="Ask anything about your farm... (e.g. how to grow chili, rice pest problems, fertilizer for onions)"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText()}"></textarea>
       <button class="sd-send" onclick="sendText()" title="Send">
         <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#2dff7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22 11 13 2 9l20-7z" stroke="#2dff7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -642,6 +651,21 @@ input:disabled+.sl{opacity:.25;cursor:not-allowed}
 </div>
 
 <script>
+// ════════════════════════════════════════════════════
+//  AUTO SETUP — Developer pre-configured API Key
+// ════════════════════════════════════════════════════
+(function(){
+  const DEV_KEY = ''; // Kosongkan — user harus pakai OpenRouter key sendiri
+  // Hapus Gemini key lama jika ada
+  const old = localStorage.getItem('sprayday_apikey') || '';
+  if(old.startsWith('AIza')){
+    localStorage.removeItem('sprayday_apikey');
+  }
+  if(!localStorage.getItem('sprayday_apikey') && DEV_KEY){
+    localStorage.setItem('sprayday_apikey', DEV_KEY);
+  }
+})();
+
 // ════════════════════════════════════════════════════
 //  CONFIG
 // ════════════════════════════════════════════════════
@@ -711,14 +735,14 @@ const CHIPS = {
     {l:'Manual Mode',a:()=>sendCmd('manual_mode')},
   ],
   agri:[
-    {l:'🌾 Grow Rice',a:()=>runCmd('How do I start a rice farm? What are the steps and what should I prepare?'),cls:'agri'},
-    {l:'☕ Grow Coffee',a:()=>runCmd('I want to start a coffee plantation. What do I need to prepare and how to plant correctly?'),cls:'agri'},
-    {l:'🌶 Grow Chili',a:()=>runCmd('How to grow chili peppers on a large scale? Best practices and common problems?'),cls:'agri'},
-    {l:'🧅 Grow Onion',a:()=>runCmd('Guide me on growing onions. Soil preparation, planting, and fertilization.'),cls:'agri'},
-    {l:'💊 Fertilizer Guide',a:()=>runCmd('What fertilizers should I use and when? Explain organic and chemical options.'),cls:'agri'},
-    {l:'🐛 Pest Control',a:()=>runCmd('What are the most common pests and diseases in large-scale farming and how to handle them?'),cls:'agri'},
-    {l:'💧 Irrigation Tips',a:()=>runCmd('Best irrigation practices for large scale farming. When and how much to water?'),cls:'agri'},
-    {l:'📅 Planting Calendar',a:()=>runCmd('Create a planting and fertilization schedule for tropical farming.'),cls:'agri'},
+    {l:'🌾 Grow Rice',a:()=>{setMode('agri');runCmd('Give me a complete guide to growing rice — best varieties, land preparation, fertilization schedule with exact doses, water management, pest control, and how to maximize yield per hectare.');},cls:'agri'},
+    {l:'☕ Grow Coffee',a:()=>{setMode('agri');runCmd('I want to start a coffee plantation. Give me the full guide: Arabica vs Robusta, land preparation, planting spacing, annual fertilization, pruning, pest management, harvest, and how to reach export quality.');},cls:'agri'},
+    {l:'🌶 Grow Chili',a:()=>{setMode('agri');runCmd('How do I grow chili peppers on a large scale profitably? Cover everything: land prep, best varieties, transplanting, fertilization schedule, irrigation, thrips and disease control, and harvest for fresh market vs export.');},cls:'agri'},
+    {l:'🧅 Grow Onion',a:()=>{setMode('agri');runCmd('Give me a complete red onion growing guide: land preparation, planting with mulch, fertilization schedule including the critical high-potassium phase, irrigation with HYDRA-32, pest and disease control, and how to achieve export-grade quality.');},cls:'agri'},
+    {l:'💊 Fertilizer Guide',a:()=>{setMode('agri');runCmd('Explain fertilizers completely: organic vs chemical, what NPK means, which nutrients do what, recommended application schedules and doses for tropical crops, and how to diagnose nutrient deficiencies from plant symptoms.');},cls:'agri'},
+    {l:'🐛 Pest & Disease',a:()=>{setMode('agri');runCmd('What are the most dangerous pests and diseases in tropical farming, how do I identify them in the field, and what is the most effective treatment for each — including both chemical and biological control options?');},cls:'agri'},
+    {l:'💧 Irrigation Tips',a:()=>{setMode('agri');runCmd('Explain modern irrigation best practices for tropical farming. Cover drip vs sprinkler vs flood irrigation, how to read my HYDRA-32 sensor data, optimal moisture levels for different crops, and when exactly to irrigate.');},cls:'agri'},
+    {l:'📅 Planting Calendar',a:()=>{setMode('agri');runCmd('Create a detailed planting and farm management calendar for tropical Indonesia — wet season vs dry season crops, best planting windows, crop rotation recommendations, and monthly tasks for the whole year.');},cls:'agri'},
   ]
 };
 
@@ -739,143 +763,648 @@ function setMode(m){
   document.getElementById('btnSensor').className='cmode-btn '+(m==='sensor'?'active-sensor':'inactive');
   document.getElementById('btnAgri').className='cmode-btn '+(m==='agri'?'active-agri':'inactive');
   document.getElementById('sdInput').placeholder=m==='sensor'?
-    'Control sensor & pump... (e.g. turn on pump)':
-    'Ask anything about farming... (e.g. How do I grow coffee on 1 hectare?)';
+    'Control pump & sensor... (e.g. activate pump, show data, switch to manual mode)':
+    'Ask anything about farming... (e.g. how to grow chili on 1 hectare, onion pests, best NPK fertilizer)';
   renderChips();
 }
 
 // ════════════════════════════════════════════════════
-//  CLAUDE AI API CALL
+//  AI ENGINE — Claude-powered via Anthropic API
 // ════════════════════════════════════════════════════
-async function callClaudeAI(userMessage, systemPrompt){
-  const apiKey = localStorage.getItem('sprayday_apikey') || '';
-  if(!apiKey){ showApiKeyModal(); return '⚠️ API Key Gemini belum diset. Klik tombol [⚙ API KEY] untuk memasukkan API Key gratis dari Google.'; }
+let aiWorking = false;
 
-  convHistory.push({role:'user', parts:[{text: userMessage}]});
-  if(convHistory.length>12) convHistory=convHistory.slice(-12);
+// ── Knowledge Base (English, always available, used as context enrichment) ──
+const KB = {
+  fertilizer: `**Complete Fertilizer Guide for Tropical Crops**
+
+**Organic Fertilizers:**
+- **Compost:** 2–5 tons/hectare — apply 2 weeks before planting for best soil conditioning
+- **Manure (cattle):** 10–20 tons/ha — rich in N, improves soil structure significantly
+- **Poultry manure:** 5–10 tons/ha — fast-acting, high nitrogen content
+- **Green manure:** Plant legumes (Mucuna, Crotalaria), incorporate before flowering
+
+**Chemical Fertilizers (per hectare):**
+- **Urea (46% N):** 200–300 kg — promotes vegetative growth, leaf & stem development
+- **TSP/SP-36 (36% P₂O₅):** 100–150 kg — root development, flowering, and fruit set
+- **KCl (60% K₂O):** 100–200 kg — fruit quality, disease resistance, drought tolerance
+- **NPK 15-15-15:** 300–400 kg — balanced base fertilizer for most crops
+
+**Application Schedule:**
+1. **Before planting (basal):** TSP + KCl + ½ Urea — incorporated into soil 5–7 cm deep
+2. **2–3 WAP (weeks after planting):** Remaining ½ Urea — side dress 5–10 cm from stem
+3. **5–6 WAP:** Additional KCl — supports fruit development and filling
+4. **Monthly foliar spray:** Micronutrients (Zn, B, Mg) at 1–2 g/L
+
+💡 **Pro Tips:** Always apply fertilizer when soil is moist but not waterlogged. Avoid application during heavy rain. Split applications reduce leaching losses by up to 40%.`,
+
+  rice: `**Complete Rice Cultivation Guide (Wetland & Dryland)**
+
+**1. Land Preparation:**
+- Plow twice to 20–25 cm depth, 2–3 weeks before planting
+- Flood field and let soak for 1 week to decompose organic matter
+- Final tillage and leveling — level within ±2 cm to ensure uniform water distribution
+- Ideal soil pH: 5.5–7.0 (add lime if below 5.5)
+
+**2. Seed Selection & Nursery:**
+- Seed requirement: 25–30 kg/ha for transplanting, 80–100 kg/ha for direct seeding
+- Soak seeds in clean water 24 hours — discard floating seeds
+- Pre-germinate 24 hours, then nursery for 21–25 days
+- Recommended varieties: Ciherang, IR64, Inpari 32, Mekongga (high-yield), Mentik Wangi (premium quality)
+
+**3. Transplanting:**
+- Transplant at 21–25 days old seedlings (4–5 leaf stage)
+- Spacing: 25×25 cm standard OR Legowo 2:1 (25×12.5×50 cm) — increases yield 15–25%
+- Plant 2–3 seedlings per hill, 3–5 cm deep
+- Replant any missing hills within 5–7 days
+
+**4. Fertilization Schedule:**
+| Timing | Urea | TSP | KCl |
+|--------|------|-----|-----|
+| Basal (planting) | 50 kg/ha | 100 kg/ha | 50 kg/ha |
+| 10–14 DAT | 100 kg/ha | — | 50 kg/ha |
+| 25–30 DAT | 100 kg/ha | — | — |
+
+**5. Water Management:**
+- Shallow flooding (2–5 cm) during vegetative stage
+- Intermittent irrigation after 30 DAT — 3 days wet, 3 days dry cycle
+- Drain field completely 10–14 days before harvest
+
+**6. Key Pests & Diseases:**
+- **Brown planthopper:** Buprofezin 25WP, 1 g/L — spray stem base
+- **Stem borer:** Carbofuran 3G, 17–20 kg/ha granular at transplanting
+- **Blast disease:** Tricyclazole 75WP, 0.5 g/L — preventive spray at booting stage
+
+**7. Harvest:**
+- 95–110 DAT (days after transplanting)
+- 90% of grains golden yellow, panicles slightly drooping
+- Expected yield: 5–8 tons/ha paddy (GKP) with good management`,
+
+  coffee: `**Complete Coffee Plantation Guide (Arabica & Robusta)**
+
+**Choosing Your Variety:**
+- **Arabica (Coffea arabica):** Altitude 800–2000 masl, air temp 15–24°C, premium price (2–3× Robusta). Best varieties: Gayo, Toraja, Flores Bajawa
+- **Robusta (Coffea canephora):** Altitude 400–800 masl, more disease resistant, higher yield. Best varieties: BP 534, BP 936, BP 358
+
+**1. Land & Hole Preparation:**
+- Clear land, maintain 30–40% shade trees (Lamtoro, Dadap, Albisia)
+- Arabica spacing: 2.5×2.5 m = 1,600 plants/ha | Robusta: 3×3 m = 1,100 plants/ha
+- Dig planting holes: 60×60×60 cm, 4–6 weeks before planting
+- Fill holes with: Topsoil + 20 kg compost + 200 g TSP + 100 g dolomite per hole
+
+**2. Planting:**
+- Best time: Start of rainy season (October–November in Indonesia)
+- Use certified nursery seedlings, 6–8 months old from polybag
+- Plant in afternoon/evening to reduce transplant stress
+- Install stakes and temporary shade immediately
+
+**3. Annual Fertilization (per tree):**
+| Age | Urea | TSP | KCl | Compost |
+|-----|------|-----|-----|---------|
+| Year 1 | 50 g | 40 g | 40 g | 5 kg |
+| Year 2 | 100 g | 80 g | 80 g | 8 kg |
+| Year 3+ | 200–300 g | 150–200 g | 150–200 g | 10–15 kg |
+
+Apply in 2 splits: start and end of rainy season.
+
+**4. Pruning System:**
+- **Single stem:** For Robusta — 1 main trunk, remove all suckers below 40 cm
+- **Multiple stem:** For Arabica — maintain 3–4 primary stems
+- Annual pruning: Remove dead, diseased, and unproductive branches
+- Rejuvenation pruning after 10–15 years — cut to 50 cm height
+
+**5. Pest & Disease Management:**
+- **Coffee Berry Borer (CBB):** Spray Beauveria bassiana (bioinsecticide) or Endosulfan; collect & destroy infested berries
+- **Coffee Leaf Rust (CLR):** Fungicide Propiconazole 25EC at 1 ml/L; remove heavily infected leaves
+- **Nematodes:** Apply Neem cake 200 g/plant + PGPR soil drench
+
+**6. Harvest & Post-Harvest:**
+- First harvest: Arabica 3 years, Robusta 2.5 years after planting
+- **Selective picking (best quality):** Pick only fully red cherries; repeat every 7–10 days
+- **Strip picking (commercial):** Strip entire branch when 70% cherries are red
+- Processing: Wet process (washed) = cleaner cup; Dry process (natural) = fruity flavor
+- Expected yield: Arabica 1.5–2.5 tons/ha | Robusta 2–3.5 tons/ha green bean equivalent`,
+
+  chili: `**Large-Scale Chili Pepper Cultivation Guide**
+
+**Recommended Varieties:**
+- **Curly chili:** TM 999, Lado F1, Gada MK — high yield, tolerant to virus
+- **Large chili:** Imperial, Laris F1 — large fruit size, good for fresh market
+- **Bird's eye chili:** Dewata 43, Pelita F1 — high pungency, good for processing
+
+**1. Land Preparation:**
+- Plow 2× to 30 cm depth; last tillage 1 week before planting
+- Form raised beds: 120 cm wide, 30 cm high, 30 cm furrow between beds
+- Adjust soil pH to 6.0–7.0 — apply 2 tons/ha dolomite lime if below 6.0
+- Apply 10 tons/ha compost + 200 kg/ha NPK as basal fertilizer; incorporate 10 cm deep
+- **Install silver-black plastic mulch** — reduces pests 40–60%, conserves moisture
+
+**2. Nursery & Transplanting:**
+- Sow seeds in seedling trays (128-cell tray), germination medium: cocopeat + compost 1:1
+- Seedling age for transplanting: 25–30 days (5–6 true leaves)
+- Transplant spacing: 50×60 cm or 60×70 cm for large varieties
+- Transplant in afternoon, water immediately, provide temporary shade 3–5 days
+
+**3. Fertilization Schedule:**
+| Week | Fertilizer | Rate |
+|------|-----------|------|
+| Planting | NPK 16-16-16 | 3 g/plant |
+| Week 2 | NPK 16-16-16 | 5 g/plant |
+| Week 4 | NPK 16-16-16 | 7 g/plant |
+| Week 6 | NPK 12-8-20 (high K) | 10 g/plant |
+| Every 2 weeks | Foliar spray (Growmore) | 2 g/L |
+
+**4. Irrigation:**
+- Critical: never let soil dry below 40% moisture — causes blossom drop
+- Drip irrigation preferred: 0.5–1 L/plant/day during vegetative; 1–2 L during fruiting
+- HYDRA-32 optimal range: 50–65% soil moisture for chili
+
+**5. Major Pests & Diseases:**
+- **Thrips:** Spinosad 0.4 ml/L — spray undersides of leaves, alternating with Abamectin
+- **Mite (spider mite):** Propargite or Hexythiazox; spray early morning
+- **Anthracnose (Colletotrichum):** Mancozeb 80WP 2 g/L + Metalaxyl; spray preventively every 7 days during wet season
+- **Fusarium wilt:** Trichoderma sp. 10 g/L soil drench + improve drainage; no chemical cure
+- **Viral diseases (CMV, PepMV):** Control thrips vectors; remove infected plants immediately
+
+**6. Harvest:**
+- First harvest: 75–90 DAT
+- Frequency: 2–3× per week at peak production
+- For fresh market: harvest at 70–80% red color
+- For processing/export: harvest fully red
+- Expected yield: 15–25 tons/ha with good management`,
+
+  pest: `**Integrated Pest Management (IPM) — Complete Field Guide**
+
+**PRINCIPLE:** Prevention first → Biological control → Chemical as last resort
+
+**Major Pests by Crop:**
+
+🌾 **Rice:**
+- **Brown Planthopper (BPH):** Monitor with yellow sticky traps. Buprofezin 25WP 1 g/L or Imidacloprid 200SL 0.5 ml/L — spray stem base, not leaves. Preserve natural enemies (spiders, Cyrtorhinus)
+- **Stem Borer:** Carbofuran 3G 20 kg/ha at transplanting; Fipronil 5SC 1 ml/L foliar spray at 15, 30 DAT
+- **Leaf Blast:** Tricyclazole 75WP 0.5 g/L preventive at tillering; Isoprothiolane if detected
+
+🌶️ **Chili & Vegetables:**
+- **Thrips:** Spinosad 120SC 0.4 ml/L + Abamectin 0.5 ml/L, alternate every 5 days
+- **Armyworm (Spodoptera):** Emamectin benzoate 0.5 g/L or Chlorantraniliprole 0.3 ml/L
+- **Aphids:** Imidacloprid 0.5 ml/L or Thiamethoxam 0.3 g/L; or insecticidal soap 5 ml/L
+
+🧅 **Onion & Garlic:**
+- **Leaf Miner (Liriomyza):** Abamectin 1.8EC 0.5 ml/L + yellow sticky traps
+- **Purple Blotch (Alternaria):** Iprodione 50WP 2 g/L spray; improve air circulation
+
+☕ **Coffee:**
+- **Coffee Berry Borer:** Beauveria bassiana 10 g/L (bioinsecticide); mass trapping with alcohol-kerosene lure
+
+**Disease Management:**
+| Disease | Pathogen | Treatment |
+|---------|---------|-----------|
+| Blast (rice) | Pyricularia | Tricyclazole, Isoprothiolane |
+| Anthracnose | Colletotrichum | Mancozeb + Metalaxyl |
+| Fusarium Wilt | Fusarium sp. | Trichoderma, improve drainage |
+| Late Blight | Phytophthora | Propineb 70WP 2 g/L |
+| Downy Mildew | Peronospora | Cymoxanil + Mancozeb |
+
+**IPM Calendar:**
+1. **Before planting:** Deep plow to expose soil pests; solarize for 2–3 weeks
+2. **Weekly scouting:** Check 10 random plants/plot; record pest counts
+3. **Action threshold:** Spray only when pest exceeds economic threshold (ET)
+4. **Rotation:** Alternate pesticide classes every 2 applications to prevent resistance
+5. **Biological agents:** Maintain 20% natural vegetation strips as refuge for beneficials
+
+💡 **Spray timing:** Always spray early morning (06:00–08:00) or late afternoon (16:00–18:00). Never spray in rain or strong wind.`,
+
+  irrigation: `**Modern Agricultural Irrigation — Complete Guide**
+
+**Irrigation Methods Compared:**
+| Method | Efficiency | Best For | Cost |
+|--------|-----------|---------|------|
+| Drip irrigation | 90–95% | Vegetables, fruit trees, coffee | High upfront, low operating |
+| Micro-sprinkler | 80–90% | Nurseries, orchards | Moderate |
+| Sprinkler | 70–80% | Lawns, field crops | Moderate |
+| Furrow/flood | 50–65% | Rice, corn on flat land | Low |
+| Subsurface drip | 95–98% | Permanent crops | Very high |
+
+**Crop Water Requirements:**
+| Crop | Water Need | Critical Stages |
+|------|-----------|----------------|
+| Rice (wetland) | 1,200–2,000 mm/season | Tillering, heading |
+| Corn | 500–800 mm | Silking, grain fill |
+| Chili | 600–800 mm | Flowering, fruiting |
+| Soybean | 450–700 mm | Flowering, pod fill |
+| Red onion | 400–600 mm | Bulb enlargement |
+| Coffee | 1,500–2,000 mm/year | Flowering, cherry development |
+
+**HYDRA-32 Sensor Interpretation:**
+- **Moisture < 30%** 🔴 CRITICAL: Activate pump immediately — plant wilting point approaching
+- **Moisture 30–50%** 🟡 DRY: Irrigation recommended within 24 hours
+- **Moisture 50–70%** 🟢 OPTIMAL: Ideal range for most crops — no action needed
+- **Moisture 70–85%** 🔵 WET: Hold irrigation — soil near field capacity
+- **Moisture > 85%** 🔴 SATURATED: Stop pump — risk of root rot and anaerobic conditions
+
+**Irrigation Scheduling by Soil Type:**
+- **Sandy soil:** Irrigate every 1–2 days (low water holding capacity)
+- **Sandy loam:** Every 2–3 days (moderate retention)
+- **Clay loam:** Every 3–4 days (good retention)
+- **Clay:** Every 4–5 days (high retention, but watch for waterlogging)
+
+**Best Practices:**
+- Water in early morning (06:00–09:00) — reduces evaporation by 30–40%
+- Avoid watering after 16:00 (leaves stay wet overnight → fungal diseases)
+- Install pressure regulators to maintain uniform drip emitter output
+- Flush drip lines monthly with diluted acid to prevent clogging
+- Monitor EC (electrical conductivity) if using fertigation`,
+
+  onion: `**Complete Red Onion (Bawang Merah) & Shallot Cultivation Guide**
+
+Red onion (Allium cepa var. aggregatum) is one of Indonesia's most valuable export crops, with prices ranging from Rp 15,000–40,000/kg at harvest and up to $1.5–2.5/kg for export-quality product.
+
+**Recommended Varieties:**
+- **Bima Brebes:** Most popular, high yield (12–18 tons/ha), good for fresh market and drying
+- **Super Philip:** Large bulb, excellent storage, good for export
+- **Trisula:** Resistant to purple blotch, good for wet-season planting
+- **Manjung:** Early maturing (55–60 days), good for off-season premium pricing
+
+**1. Climate & Soil Requirements:**
+- Optimal altitude: 0–800 masl (lowland best for bulb development)
+- Temperature: 25–32°C during growing, dry weather at harvest
+- Soil: Sandy loam to loam, pH 5.8–7.0, well-drained (no waterlogging)
+- Critical: Onions HATE waterlogging — ensure excellent drainage
+
+**2. Land Preparation:**
+- Plow 2× to 30 cm depth; form raised beds 120–140 cm wide, 20–30 cm high
+- Adjust pH with 1–2 tons/ha dolomite if below 5.8
+- Basal fertilizer (per hectare): Compost 10–15 tons + TSP 150 kg + KCl 100 kg + NPK 16-16-16 200 kg
+- Install silver-black mulch plastic — reduces weeding labor by 70% and conserves moisture
+- Make planting holes 10×15 cm spacing through mulch
+
+**3. Planting:**
+- Use certified bulb seeds (benih umbi), 600–800 kg/ha
+- Select firm, healthy bulbs — discard soft or sprouted ones
+- Cut bulb tips 1/3 from top to accelerate sprouting
+- Best planting: dry season (May–August) for highest quality and price
+
+**4. Fertilization Schedule:**
+| Week After Planting | Fertilizer | Rate (kg/ha) | Method |
+|---------------------|-----------|--------------|--------|
+| Day 0 (basal) | Compost + TSP + KCl | 15,000 + 150 + 100 | Incorporated |
+| Week 2 | Urea + NPK 16-16-16 | 75 + 100 | Side dress |
+| Week 4 | Urea + KCl | 75 + 75 | Side dress |
+| Week 6 | KNO₃ (potassium nitrate) | 50 | Foliar 2 g/L |
+| Weekly | Foliar micronutrient (ZnSO4, Boron) | — | 1–2 g/L spray |
+
+💡 **Expert tip:** High potassium (K) in weeks 6–8 is the secret to large, firm, export-quality bulbs. Don't skip it!
+
+**5. Water Management:**
+- Critical period: bulb enlargement week 5–8 — keep moisture 50–65% (HYDRA-32 optimal zone)
+- Irrigation frequency: every 2–3 days for sandy soil, every 3–4 days for clay loam
+- **Stop irrigation 7–10 days before harvest** — essential for dry outer skin (curing)
+- Drip irrigation ideal: reduces purple blotch risk by 60% vs sprinkler
+
+**6. Major Pests & Diseases:**
+- **Thrips (Thrips tabaci):** Most damaging pest. Spinosad 120SC 0.4 ml/L + yellow sticky traps. Spray undersides of leaves morning. Alternate with Abamectin 1.8EC
+- **Purple Blotch (Alternaria porri):** Main fungal disease in wet conditions. Iprodione 50WP 2 g/L + Mancozeb 80WP 2 g/L, spray every 5–7 days preventively
+- **Downy Mildew (Peronospora destructor):** Appears as gray-purple coating on leaves. Chlorothalonil 75WP 2 g/L; improve air circulation
+- **Leaf Miner (Liriomyza huidobrensis):** Abamectin 1.8EC 0.5 ml/L; use yellow sticky traps in large numbers
+
+**7. Harvest & Post-Harvest:**
+- Harvest time: 60–75 days after planting (variety-dependent)
+- Sign of maturity: 80% of leaves have fallen naturally (lodging)
+- Harvest in dry weather — pull bulbs by hand or fork
+- **Curing:** Dry in well-ventilated shade for 14–21 days (critical for storage & export quality)
+- Do NOT dry in direct sun — causes skin bleaching and reduces export grade
+
+**8. Export Quality Standards:**
+- Size: 3–5 cm diameter (grade A for export)
+- Moisture content at export: <85%
+- No visible rot, disease, or mechanical damage
+- Packaging: mesh bags 5–10 kg, with cool-chain storage at 25–28°C
+- Target markets: Malaysia, Singapore, Thailand, Middle East
+- **Export price premium:** 30–50% above local price for certified export quality
+
+**9. Yield Expectations:**
+- Average: 10–15 tons/ha fresh weight
+- Good management: 15–20 tons/ha
+- World-class: 20–25 tons/ha with precision agriculture
+
+💡 **Brebes Success Formula:** Bima variety + silver mulch + drip irrigation + high-K fertilization at week 6 + strict thrips control = 20+ tons/ha export quality`,
+
+  calendar: `**Tropical Farming Calendar — Indonesia & Southeast Asia**
+
+**Seasonal Cropping Guide:**
+
+🌧️ **WET SEASON (October–March):**
+| Crop | Planting Time | Notes |
+|------|-------------|-------|
+| Lowland rice | Oct–Nov | Primary season, highest yield potential |
+| Upland rice | Nov–Dec | Rain-fed, drought-tolerant varieties |
+| Corn | Oct–Nov | Use disease-tolerant hybrids |
+| Soybean | Nov–Dec | Good protein content in wet season |
+| Highland vegetables | Oct–Nov | Cabbage, carrot, potato at altitude >700 masl |
+| Coffee planting | Oct–Nov | Best time for new seedlings |
+
+☀️ **DRY SEASON (April–September):**
+| Crop | Planting Time | Notes |
+|------|-------------|-------|
+| Red onion | May–Jul | Best quality, lower disease pressure |
+| Chili | Apr–Jun | Premium price in dry season |
+| Watermelon/Melon | Apr–May | Needs irrigation but excellent quality |
+| Groundnut | Apr–May | High yield in well-drained soil |
+| Dry-season rice | Apr–May | Requires reliable irrigation (HYDRA-32!) |
+| Tobacco | Jun–Jul | Only suitable dry-season crop |
+
+**Monthly Farm Management Calendar:**
+| Month | Priority Tasks |
+|-------|--------------|
+| Jan–Feb | Wet season crop management, pest monitoring |
+| Mar | Harvest wet season crops, soil testing |
+| Apr | Land preparation for dry season, drip system check |
+| May–Jun | Dry season planting, fertilizer application |
+| Jul–Aug | Pest management, foliar feeding |
+| Sep | Harvest dry season crops, cover cropping |
+| Oct | Land prep for wet season, apply compost |
+| Nov | Wet season planting, rice nursery |
+| Dec | Crop maintenance, plan next year |
+
+**Crop Rotation Recommendations:**
+- Rice → Soybean → Corn → Rice (breaks disease cycles)
+- Chili → Onion → Corn → Chili (alternating families)
+- Coffee intercropped with banana/lamtoro (nitrogen fixation + shade)
+
+💡 **Key Rule:** Never plant the same crop family twice consecutively in the same field!`
+};
+
+function getKBContext(question){
+  const q = question.toLowerCase();
+  const matches = [];
+  if(/(fertilizer|pupuk|urea|npk|compost|nutrient|feeding|macronutrient)/.test(q)) matches.push(KB.fertilizer);
+  if(/(rice|padi|paddy|sawah|gabah)/.test(q)) matches.push(KB.rice);
+  if(/(coffee|kopi|arabica|robusta|espresso|plantation)/.test(q)) matches.push(KB.coffee);
+  if(/(chili|cabai|pepper|capsicum|chile)/.test(q)) matches.push(KB.chili);
+  if(/(onion|bawang|shallot|garlic)/.test(q)) matches.push(KB.onion||'');
+  if(/(pest|disease|hama|penyakit|insect|fungus|blight|wilt|virus|spray|pesticide)/.test(q)) matches.push(KB.pest);
+  if(/(irrigation|watering|siram|irigasi|drip|moisture|humidity|water)/.test(q)) matches.push(KB.irrigation);
+  if(/(calendar|schedule|season|jadwal|musim|planting time|when to plant)/.test(q)) matches.push(KB.calendar);
+  return matches.length ? matches[0] : null; // Return most relevant KB entry
+}
+
+async function callClaudeAI(userMessage, systemPrompt){
+  const apiKey = localStorage.getItem('sprayday_apikey');
+  if(!apiKey){
+    return generateFallback(userMessage, systemPrompt);
+  }
+
+  // Build full conversation for this call
+  convHistory.push({role:'user', content: userMessage});
+  if(convHistory.length > 30) convHistory = convHistory.slice(-30);
+
+  // Enrich system prompt with KB context if relevant
+  const kbCtx = getKBContext(userMessage);
+  const enrichedSystem = kbCtx
+    ? systemPrompt + '\n\n--- REFERENCE KNOWLEDGE (use this to enhance your answer, but always expand with your own expertise and write in a natural conversational way) ---\n' + kbCtx
+    : systemPrompt;
+
+  // Full messages array: system + history
+  const messages = [
+    { role: 'system', content: enrichedSystem },
+    ...convHistory
+  ];
 
   try{
-    const body = {
-      system_instruction:{ parts:[{text: systemPrompt}] },
-      contents: convHistory,
-      generationConfig:{ maxOutputTokens:1000, temperature:0.7 }
-    };
-
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }
-    );
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'Sprayday AI Agricultural Assistant'
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-sonnet-4-5',
+        max_tokens: 2500,
+        temperature: 0.7,
+        messages: messages
+      })
+    });
 
     if(!resp.ok){
-      const err = await resp.json().catch(()=>({}));
-      if(resp.status===400&&err.error?.message?.includes('API_KEY')){
-        localStorage.removeItem('sprayday_apikey');
-        showApiKeyModal();
-        return '❌ API Key tidak valid. Silakan masukkan API Key Gemini yang benar.';
-      }
-      if(resp.status===429) return '⚠️ Terlalu banyak permintaan. Tunggu beberapa detik lalu coba lagi.';
-      return `❌ Error (${resp.status}): ${err.error?.message||'Unknown error'}`;
+      const errData = await resp.json().catch(()=>({}));
+      const errMsg = errData?.error?.message || 'HTTP ' + resp.status;
+      console.warn('OpenRouter error:', errMsg);
+      // Show specific error to user
+      if(resp.status === 401) return '**API Key Error:** Your API key appears to be invalid or expired. Please click the API KEY button and enter a valid OpenRouter key from openrouter.ai/keys';
+      if(resp.status === 402) return '**Credit Limit:** Your OpenRouter account has run out of credits. Please top up at openrouter.ai to continue using AI responses.';
+      if(resp.status === 429) return '**Rate Limited:** Too many requests. Please wait a moment and try again.';
+      throw new Error(errMsg);
     }
 
     const data = await resp.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, tidak ada respons dari AI.';
-    convHistory.push({role:'model', parts:[{text}]});
-    if(convHistory.length>12) convHistory=convHistory.slice(-12);
-    return text;
-  }catch(e){
-    console.error('Gemini error:',e);
-    return '❌ Gagal terhubung ke AI. Pastikan koneksi internet aktif.';
+    const text = data?.choices?.[0]?.message?.content;
+
+    if(text && text.trim()){
+      convHistory.push({role:'assistant', content: text});
+      if(convHistory.length > 30) convHistory = convHistory.slice(-30);
+      return text;
+    }
+    throw new Error('Empty response from AI');
+
+  } catch(e){
+    console.warn('AI call failed:', e.message);
+    sysLog('AI error: ' + e.message, 'le');
+    // Only use fallback if it's a network/fetch error, not an API error
+    const kbResult = getKBContext(userMessage);
+    if(kbResult) return kbResult + '\n\n*Note: AI connection failed — showing cached knowledge. Check your API key and internet connection.*';
+    return generateFallback(userMessage, systemPrompt);
   }
 }
 
-const AGRI_SYSTEM = `You are Sprayday, an expert AI agricultural assistant focused on helping farmers — both beginners and advanced — achieve excellent, export-quality results.
+function generateFallback(question, systemPrompt){
+  const q = question.toLowerCase();
+  const isSensor = systemPrompt.includes('HYDRA-32');
 
-Your expertise covers:
-- Rice, coffee, chili, onion, corn, palm oil, cocoa, rubber, vegetables, fruits, and all major tropical crops
-- Soil preparation, seed selection, planting techniques, spacing, irrigation schedules
-- Fertilizer types (NPK, organic, urea, TSP, KCl), dosage, timing, and application methods
-- Pest and disease identification, prevention, and treatment (organic and chemical)
-- Harvest timing, post-harvest handling, grading, and export standards
-- Large-scale farm management, labor efficiency, cost optimization
-- Climate and weather considerations for tropical farming
-- Modern agricultural technology (sensors, irrigation systems, drones)
-- Organic and sustainable farming practices
+  if(isSensor){
+    const cond = moisture < 30 ? 'CRITICAL DRY — immediate irrigation required'
+               : moisture > 70 ? 'SATURATED — stop irrigation, risk of root rot'
+               : moisture < 50 ? 'DRY — irrigation recommended soon'
+               : 'OPTIMAL — no action needed';
+    const advice = moisture < 30 ? '⚠️ **Action Required:** Activate the pump immediately. Soil is dangerously dry and plants may be wilting.'
+                 : moisture > 70 ? '💧 **Action Required:** Deactivate pump. Excess moisture causes anaerobic conditions and root disease.'
+                 : '✅ **Status:** Irrigation system is performing well. Continue monitoring.';
+    return `**📊 HYDRA-32 Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
+  }
 
-IMPORTANT RULES:
-- Always give practical, actionable advice with specific numbers (amounts, timing, spacing)
-- Understand questions even when phrased informally or without technical terms
-- Adapt advice to scale (backyard garden to commercial plantation)
-- When asked about irrigation or soil moisture, connect to the HYDRA-32 sensor data if relevant
-- Always respond in English regardless of input language
-- Format responses clearly with bold headers when listing steps
-- Be encouraging and supportive — many users are beginners
-- Current sensor data: MOISTURE_PLACEHOLDER% soil moisture, pump is PUMP_PLACEHOLDER`;
+  const kbCtx = getKBContext(question);
+  if(kbCtx) return kbCtx;
 
-const SENSOR_SYSTEM = `You are Sprayday, an intelligent irrigation control assistant for the HYDRA-32 ESP32 system.
+  return `I'm here to help with all your farming questions! I can provide detailed guidance on:\n\n🌾 **Crop Cultivation:** Rice, coffee, chili, onion, corn, palm oil, cocoa, and more\n💊 **Fertilization:** NPK recommendations, organic options, application timing\n🐛 **Pest & Disease Control:** Identification, treatment, and prevention\n💧 **Irrigation:** Scheduling, methods, water requirements by crop\n📅 **Farm Planning:** Seasonal calendars, crop rotation, market timing\n\nJust ask me anything — whether you're starting a new farm or solving a specific problem!`;
+}
 
-Current sensor data:
-- Soil moisture: MOISTURE_PLACEHOLDER%
+const AGRI_SYSTEM = `You are Sprayday AI — a world-class agricultural mentor with 25+ years of hands-on tropical farming experience. You are simultaneously a senior agronomist, soil scientist, plant pathologist, and farm business consultant who genuinely cares about helping every farmer succeed.
+
+ABSOLUTE LANGUAGE RULE: ALWAYS RESPOND IN ENGLISH. No exceptions. Even if the user writes in Indonesian, Malay, or any other language — your response is always in English. This is a hard requirement.
+
+YOUR CORE MISSION: When a farmer asks you something, give them the COMPLETE answer — not a summary, not a teaser, not bullet points that say nothing. Give them the full picture: the process, the exact numbers, the common mistakes, the pro tips, and what to do next. A farmer reading your answer should feel like they just had a 30-minute consultation with the best agronomist in the country.
+
+EXPERTISE: You know every tropical crop inside out — rice, coffee, chili, red onion, corn, palm oil, cocoa, rubber, cassava, sweet potato, banana, mango, durian, watermelon, melon, tomato, eggplant, soybean, peanut, and dozens more. You know soil science, fertilizer chemistry, plant nutrition, pest & disease management (IPM), post-harvest handling, export standards, and farm economics.
+
+STRICT RESPONSE RULES — ALL MUST BE FOLLOWED:
+
+RULE 1 — WRITE DETAILED, COMPREHENSIVE ANSWERS.
+Every farming question deserves a thorough answer. Cover the full picture: process steps, exact doses (g/L, kg/ha), timing (DAT = days after transplanting), spacing (cm), expected yield (tons/ha), cost estimates, common mistakes, and what to do next. Short vague answers are useless to real farmers. Aim for responses that fully equip the farmer to take action.
+
+RULE 2 — BE WARM AND CONVERSATIONAL, NOT ROBOTIC.
+You are a mentor, not a manual. Use natural language: "Here is the thing most farmers get wrong...", "Let me walk you through this step by step...", "The single most important thing here is...", "A pro tip that really works in the field is...", "Do not make the mistake of..."
+
+RULE 3 — GIVE EXACT NUMBERS ALWAYS.
+Never say "apply fertilizer" — say "apply 150 kg/ha of Urea split across 3 applications: 50 kg at planting, 75 kg at 14 DAT, and 25 kg at 28 DAT."
+Never say "water regularly" — say "irrigate every 2-3 days, targeting 55-65% soil moisture on your HYDRA-32 sensor."
+Never say "harvest when mature" — say "harvest at 75-90 DAT when 80% of fruit has turned red for fresh market, or fully red for export."
+
+RULE 4 — USE CLEAR STRUCTURE WITH HEADERS AND SECTIONS.
+For detailed crop or technique questions, organize your answer with ## section headers. Use bullet points for lists. Use tables for comparisons, schedules, or dosage information. This makes the answer easy to follow and act on.
+
+RULE 5 — ALWAYS LEAD INTO THE NEXT LOGICAL STEP.
+After answering the main question, naturally guide the farmer forward: "Now that you understand land preparation, here is what to focus on during the first two weeks after planting..." This makes the conversation feel like a real mentoring session.
+
+RULE 6 — INCLUDE FIELD WISDOM IN EVERY ANSWER.
+Share practical insights beyond the textbook: what signs to watch for in the field (leaf color, root smell, soil texture), beginner mistakes that cost money, tricks that experienced farmers use, and what export buyers actually look for.
+
+RULE 7 — EXPORT-QUALITY MINDSET.
+When relevant, always mention what extra steps achieve export-grade results. Export produce earns 30-80% more than local market prices. Help farmers see this opportunity and what it takes.
+
+RULE 8 — USE LIVE SENSOR DATA WHEN RELEVANT.
+Current HYDRA-32 reading: soil moisture is MOISTURE_PLACEHOLDER%, pump is PUMP_PLACEHOLDER, mode is MODE_PLACEHOLDER. When discussing irrigation or crop water needs, reference this actual live reading and explain what it means for their crops right now.
+
+RESPONSE STRUCTURE FOR CROP GROWING QUESTIONS:
+When someone asks how to grow or manage a crop, always cover these sections:
+## Why This Crop and What to Expect
+## Choosing the Right Variety
+## Land Preparation
+## Planting Guide
+## Fertilization Schedule
+## Water Management
+## Pest and Disease Control
+## Harvest and Post-Harvest
+## Export Quality Standards
+## Your Next Steps`
+
+
+const SENSOR_SYSTEM = `You are Sprayday AI — an expert agricultural mentor integrated with the HYDRA-32 precision irrigation system. You combine deep agronomy knowledge with real-time soil sensor data to give farmers smart, specific, actionable irrigation guidance.
+
+ABSOLUTE LANGUAGE RULE: ALWAYS RESPOND IN ENGLISH. No exceptions whatsoever.
+
+LIVE HYDRA-32 SENSOR DATA RIGHT NOW:
+- Soil moisture: MOISTURE_PLACEHOLDER% (0% = bone dry, 100% = fully saturated)
 - Water pump: PUMP_PLACEHOLDER
 - System mode: MODE_PLACEHOLDER
-- Dry threshold: 30% (pump activates below this)
-- Wet threshold: 70% (pump deactivates above this)
+- Automatic thresholds: Pump ON below 30%, Pump OFF above 70%
 
-You help users:
-- Control the water pump (on/off)
-- Understand sensor readings
-- Switch between auto and manual mode
-- Analyze soil conditions
-- Provide irrigation recommendations based on current data
+SENSOR READING INTERPRETATION:
+- 0-30%: CRITICAL — plants are approaching wilting point, activate pump immediately
+- 30-50%: DRY — soil is drying out, irrigate within 12-24 hours
+- 50-70%: OPTIMAL — ideal moisture range for most tropical crops
+- 70-85%: WET — soil is near field capacity, hold irrigation
+- 85-100%: SATURATED — stop pump immediately, risk of root rot and anaerobic conditions
 
-Be concise, direct, and helpful. Respond in the same language as the user.`;
+HOW YOU RESPOND IN SENSOR MODE:
+- Always start by stating the current live moisture reading and what it means
+- Give a clear, specific recommendation based on the reading (activate pump / hold / monitor)
+- Explain WHY that moisture level matters biologically — what is happening to the plant roots right now
+- If the user mentions a specific crop, tailor your advice to that crop exact water requirements
+- After the immediate recommendation, guide them on what to watch for next
+- Be warm and mentor-like, not robotic or clinical
+- Write detailed, useful paragraphs — not one-line answers`
+
 
 function getSensorContext(sys){
   return sys
     .replace('MOISTURE_PLACEHOLDER', moisture)
-    .replace('PUMP_PLACEHOLDER', pump ? 'ACTIVE (running)' : 'OFFLINE (stopped)')
-    .replace('MODE_PLACEHOLDER', manual ? 'MANUAL override' : 'AUTO control');
+    .replace('PUMP_PLACEHOLDER', pump ? 'ACTIVE — pump is running' : 'STANDBY — pump is offline')
+    .replace('MODE_PLACEHOLDER', manual ? 'MANUAL override (user-controlled)' : 'AUTO control (threshold-based)');
 }
 
 // ════════════════════════════════════════════════════
 //  PROCESS MESSAGE (voice or text)
 // ════════════════════════════════════════════════════
 async function processMessage(input){
+  if(aiWorking){
+    addAI('⏳ Still processing your previous request. Please wait a moment and try again.');
+    return;
+  }
+  aiWorking = true;
   setStat('THINKING...','thinking');
   showThink();
 
   const t = input.toLowerCase();
-  let response = '';
 
-  // Sensor control commands (direct, no AI needed)
+  // ── SENSOR MODE: perintah langsung tanpa AI ──
   if(chatMode==='sensor'){
-    if(/(activate|turn on|start|enable|pump on|nyalakan|aktifkan).*(pump|water|pompa|air)/.test(t)||/(pump|pompa).*(on|aktif|nyala|hidup)/.test(t)){
+    // Aktifkan pompa
+    if(/(activate|turn on|start|enable|pump on|nyalakan|aktifkan|hidupkan|on).*(pump|pompa|air|water)/.test(t)
+      ||/(pump|pompa).*(on|aktif|nyala|hidup|start)/.test(t)
+      ||t==='pump on'||t==='activate pump'||t==='turn on pump'){
       sendCmd('pump_on');
-      removeThink();
-      respond(`Water pump activated. Command sent to ESP32. Soil moisture is currently ${moisture}%.`);return;
+      removeThink(); aiWorking=false;
+      respond(`✅ **Water Pump Activated!**\n\nCommand sent to ESP32. Current soil moisture: **${moisture}%**. ${moisture>70?' Soil is already quite wet — consider deactivating the pump in a few minutes.':moisture<30?' Good call — soil is dry and needs irrigation.':' Moisture is in optimal range.'}`);
+      return;
     }
-    if(/(deactivate|turn off|stop|disable|pump off|matikan|nonaktifkan).*(pump|water|pompa|air)/.test(t)||/(pump|pompa).*(off|mati|stop|nonaktif)/.test(t)){
+    // Nonaktifkan pompa
+    if(/(deactivate|turn off|stop|disable|pump off|matikan|nonaktifkan|padamkan|off).*(pump|pompa|air|water)/.test(t)
+      ||/(pump|pompa).*(off|mati|stop|nonaktif|padam)/.test(t)
+      ||t==='pump off'||t==='deactivate pump'||t==='turn off pump'){
       sendCmd('pump_off');
-      removeThink();
-      respond(`Water pump deactivated. Pump is now offline. Soil moisture: ${moisture}%.`);return;
+      removeThink(); aiWorking=false;
+      respond(`✅ **Water Pump Deactivated!**\n\nPump has stopped. Current soil moisture: **${moisture}%**. ${moisture<30?' Note: Soil is still dry — you may want to reactivate the pump soon.':''}`);
+      return;
     }
-    if(/(auto|otomatis|automatic)/.test(t)){
+    // Mode otomatis
+    if(/(auto|otomatis|automatic|auto mode)/.test(t)&&!/(manual)/.test(t)){
       sendCmd('auto_mode');
-      removeThink();
-      respond(`Switched to automatic mode. The pump will now be controlled automatically based on soil moisture thresholds.`);return;
+      removeThink(); aiWorking=false;
+      respond(`✅ **Automatic Mode Activated**\n\nThe system will now control the pump automatically:\n- Pump ON when moisture drops below **30%**\n- Pump OFF when moisture rises above **70%**\n\nCurrent moisture: **${moisture}%** — ${moisture<30?'Pump will activate shortly.':moisture>70?'Pump will remain off.':'System is monitoring in optimal range.'}`);
+      return;
     }
-    if(/(manual|override)/.test(t)&&!/(auto|otomatis)/.test(t)){
+    // Mode manual
+    if(/(manual|override|manual mode)/.test(t)&&!/(auto|otomatis)/.test(t)){
       sendCmd('manual_mode');
-      removeThink();
-      respond(`Switched to manual mode. You now have full control over the pump.`);return;
+      removeThink(); aiWorking=false;
+      respond(`✅ **Manual Mode Activated**\n\nYou now have full control over the pump. Use the Activate/Deactivate Pump buttons below, the quick action buttons on the dashboard, or voice commands like "activate pump" or "deactivate pump".`);
+      return;
+    }
+    // Tampilkan data monitoring (tanpa AI)
+    if(/(show|display|tampil|lihat|current|sensor|data|monitoring|moisture|kelembaban|status|cek|check)/.test(t)){
+      const cond = moisture<30?'🔴 CRITICAL DRY':moisture>70?'🔵 SATURATED':moisture<50?'🟡 DRY':'🟢 OPTIMAL';
+      const advice = moisture<30?'Activate pump immediately — plants are approaching wilting point.':moisture>70?'Deactivate pump. Excess moisture causes root rot and disease.':moisture<50?'Irrigation recommended within the next 12–24 hours.':'No irrigation needed. System is performing excellently.';
+      removeThink(); aiWorking=false;
+      respond(`📊 **REAL-TIME SENSOR DATA**\n\n🌱 **Soil Moisture:** ${moisture}% — ${cond}\n💧 **Water Pump:** ${pump?'🟢 ACTIVE — Running':'⚫ STANDBY — Offline'}\n⚙️ **System Mode:** ${manual?'🔧 MANUAL Override':'🤖 AUTO Control'}\n\n📏 Dry Threshold: 30% | Wet Threshold: 70%\n\n💡 **Recommendation:** ${advice}`);
+      return;
+    }
+    // Analisis & saran (tanpa AI jika tidak ada key)
+    if(/(analyz|analisi|analy|advise|saran|rekomendasi|advice)/.test(t)){
+      const apiKey = localStorage.getItem('sprayday_apikey');
+      if(!apiKey){
+        // Fallback analisis lokal
+        const cond = moisture<30?'critically dry — immediate irrigation required':moisture>70?'saturated — stop irrigation now':moisture<50?'drying out — irrigation recommended':'optimal — no action needed';
+        removeThink(); aiWorking=false;
+        respond(`🔍 **SYSTEM ANALYSIS**\n\nSoil moisture is currently **${moisture}%** — ${cond}.\n\n**Pump:** ${pump?'🟢 ACTIVE':'⚫ OFFLINE'} | **Mode:** ${manual?'🔧 MANUAL':'🤖 AUTO'}\n\n${moisture<30?'⚠️ **Action Required:** Activate pump immediately. At this moisture level, plants are under severe water stress and root damage may occur if not irrigated within hours.':moisture>70?'💧 **Action Required:** Deactivate pump. Waterlogged soil reduces oxygen to roots, promotes fungal diseases, and can kill crops within days.':'✅ **System Status:** Everything is running optimally. Your irrigation management is excellent — keep monitoring and maintain this range.'}`);
+        return;
+      }
+      // Lanjut ke AI jika ada key
     }
   }
 
-  // AI response (Claude API)
-  const systemPrompt = getSensorContext(chatMode === 'agri' ? AGRI_SYSTEM : SENSOR_SYSTEM);
-  response = await callClaudeAI(input, systemPrompt);
-
-  removeThink();
-  respond(response);
+  // ── AI RESPONSE ──
+  try{
+    const systemPrompt = getSensorContext(chatMode==='agri' ? AGRI_SYSTEM : SENSOR_SYSTEM);
+    const response = await callClaudeAI(input, systemPrompt);
+    removeThink();
+    respond(response);
+  }catch(e){
+    removeThink();
+    respond('❌ An unexpected error occurred. Please try again in a moment.');
+  }finally{
+    aiWorking = false;
+    setStat('READY TO ASSIST','');
+  }
 }
 
 function respond(text){
@@ -895,14 +1424,104 @@ function sendText(){
   processMessage(v);
 }
 
-// Format AI markdown-ish text for display
-function formatAIText(text){
-  return escHtml(text)
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g,'<em>$1</em>')
-    .replace(/\n\n/g,'</p><p style="margin-top:8px">')
-    .replace(/\n/g,'<br>');
+// Format AI markdown-ish text for display — rich, clean rendering
+function formatAIText(raw){
+  // Step 1: process line by line to handle tables cleanly
+  const lines = raw.split('\n');
+  let out = [];
+  let tableRows = [];
+  let inTable = false;
+
+  function flushTable(){
+    if(!tableRows.length) return;
+    let html = '<div style="overflow-x:auto;margin:10px 0 12px"><table style="width:100%;border-collapse:collapse;border:1px solid rgba(45,255,122,.15);border-radius:3px">';
+    tableRows.forEach((cells, i) => {
+      const isHeader = i === 0;
+      html += '<tr style="background:' + (isHeader ? 'rgba(45,255,122,.07)' : (i%2===0 ? 'transparent' : 'rgba(255,255,255,.015)')) + '">';
+      cells.forEach(cell => {
+        const tag = isHeader ? 'th' : 'td';
+        const st = isHeader
+          ? 'padding:6px 12px;border:1px solid rgba(45,255,122,.2);color:#2dff7a;font-size:.68rem;letter-spacing:1.2px;text-align:left;font-weight:700;text-transform:uppercase'
+          : 'padding:5px 12px;border:1px solid rgba(45,255,122,.07);font-size:.72rem;color:#d4f5e0;vertical-align:top';
+        html += '<' + tag + ' style="' + st + '">' + cell.trim() + '</' + tag + '>';
+      });
+      html += '</tr>';
+    });
+    html += '</table></div>';
+    out.push(html);
+    tableRows = [];
+    inTable = false;
+  }
+
+  for(let i = 0; i < lines.length; i++){
+    const line = lines[i];
+    const trimmed = line.trim();
+    // Skip table separator rows like |---|---|
+    if(/^\|[\s\-:|]+\|$/.test(trimmed)){
+      continue;
+    }
+    // Table data rows
+    if(/^\|.+\|$/.test(trimmed)){
+      if(!inTable) inTable = true;
+      const cells = trimmed.split('|').slice(1,-1);
+      tableRows.push(cells);
+      continue;
+    }
+    // Non-table line — flush any pending table first
+    if(inTable) flushTable();
+    out.push(line);
+  }
+  if(inTable) flushTable();
+
+  let t = out.join('\n');
+
+  // Step 2: escape HTML (but preserve our injected table HTML)
+  // Split on our table divs, escape non-table parts, rejoin
+  const tablePlaceholders = [];
+  t = t.replace(/<div style="overflow-x:auto[\s\S]*?<\/table><\/div>/g, (m) => {
+    tablePlaceholders.push(m);
+    return '\x00TABLE' + (tablePlaceholders.length-1) + '\x00';
+  });
+  t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Restore tables
+  t = t.replace(/\x00TABLE(\d+)\x00/g, (m, idx) => tablePlaceholders[parseInt(idx)]);
+
+  // Step 3: apply markdown formatting
+  // Headers
+  t = t.replace(/^#### (.+)$/gm, '<div style="font-family:\'Orbitron\',sans-serif;font-size:.75rem;color:#d4a017;letter-spacing:2px;margin:14px 0 5px;text-transform:uppercase">$1</div>');
+  t = t.replace(/^### (.+)$/gm,  '<div style="font-family:\'Orbitron\',sans-serif;font-size:.8rem;color:#d4a017;letter-spacing:2px;margin:14px 0 5px;text-transform:uppercase">$1</div>');
+  t = t.replace(/^## (.+)$/gm,   '<div style="font-family:\'Orbitron\',sans-serif;font-size:.88rem;color:#2dff7a;letter-spacing:2.5px;margin:18px 0 7px;text-transform:uppercase;text-shadow:0 0 10px rgba(45,255,122,.3);border-bottom:1px solid rgba(45,255,122,.15);padding-bottom:4px">$1</div>');
+  t = t.replace(/^# (.+)$/gm,    '<div style="font-family:\'Orbitron\',sans-serif;font-size:.95rem;color:#2dff7a;letter-spacing:3px;margin:20px 0 8px;text-transform:uppercase;text-shadow:0 0 14px rgba(45,255,122,.4)">$1</div>');
+
+  // Bold / italic
+  t = t.replace(/\*\*\*(.+?)\*\*\*/g, '<strong style="color:#f0c040"><em>$1</em></strong>');
+  t = t.replace(/\*\*(.+?)\*\*/g,     '<strong style="color:#f0c040">$1</strong>');
+  t = t.replace(/\*(.+?)\*/g,         '<em style="color:rgba(45,255,122,.9)">$1</em>');
+
+  // Inline code
+  t = t.replace(/`([^`]+)`/g, '<code style="background:rgba(45,255,122,.08);color:#2dff7a;padding:2px 7px;border-radius:3px;font-family:\'Share Tech Mono\',monospace;font-size:.8em;border:1px solid rgba(45,255,122,.15)">$1</code>');
+
+  // Horizontal rule
+  t = t.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(45,255,122,.15);margin:12px 0">');
+
+  // Bullet lists (- or •)
+  t = t.replace(/^[ \t]*[-•] (.+)$/gm, '<li class="ai-li">$1</li>');
+  // Sub-bullets (  - )
+  t = t.replace(/^[ \t]{2,}[-•] (.+)$/gm, '<li class="ai-li ai-li-sub">$1</li>');
+  // Numbered lists
+  t = t.replace(/^\d+\. (.+)$/gm, '<li class="ai-li ai-li-num">$1</li>');
+  // Wrap consecutive li into ul
+  t = t.replace(/(<li class="ai-li[^"]*">[\s\S]*?<\/li>\n?)+/g, (block) => {
+    return '<ul style="margin:6px 0 8px 4px;padding:0;list-style:none">' + block + '</ul>';
+  });
+
+  // Paragraphs — convert double newlines to paragraph breaks
+  t = t.replace(/\n\n+/g, '</p><p style="margin:5px 0 0">');
+  t = t.replace(/\n/g, '<br>');
+
+  return '<p style="margin:0;line-height:1.65">' + t + '</p>';
 }
+
 
 // ════════════════════════════════════════════════════
 //  TTS
@@ -998,15 +1617,30 @@ function endRec(){
 function openSD(){
   document.getElementById('sdModal').classList.add('open');
   document.getElementById('app').classList.add('dim');
-  if(window.speechSynthesis)window.speechSynthesis.getVoices();
+  updateApiKeyBtn();
+  // Preload voices saat user gesture (klik FAB = user gesture valid)
+  if(window.speechSynthesis){
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.getVoices();
+  }
   if(!sdOpened){
     sdOpened=true;
-    // Reset conversation history for fresh start
     convHistory=[];
+    aiWorking=false;
+    const mStatus = moisture < 30 ? 'CRITICAL DRY — your plants need water right now' : moisture > 70 ? 'SATURATED — hold irrigation, soil is very wet' : moisture < 50 ? 'DRY — irrigation recommended within 24 hours' : 'OPTIMAL — your soil is in excellent condition';
+    const w = `Welcome to Sprayday AI — your personal agricultural intelligence system.
+
+Right now, your HYDRA-32 sensor reads ${moisture}% soil moisture — ${mStatus}.
+
+I am here to be your senior agronomist, available 24/7, always giving you specific and complete answers. Whether you are starting your first farm or scaling up to export markets, I will guide you through every step.
+
+I can help you grow any crop with exact fertilizer doses, spacing, and timing. I can diagnose pests and diseases and tell you exactly what to apply. I can analyze your HYDRA-32 data and tell you precisely when to irrigate. And I can guide you toward export-quality results that earn 30 to 80 percent more than local market prices.
+
+Type your question below or choose a topic to get started — I will give you a complete, detailed answer you can act on today.`
     setTimeout(()=>{
-      const w=`Welcome to Sprayday AI. I am your intelligent agricultural assistant. I can help you control the irrigation system, provide farming guides for rice, coffee, chili, onion, and any other crop, and answer all your questions about agriculture and farming. Current soil moisture is ${moisture} percent. How can I assist you today?`;
-      addAI(formatAIText(w));speak(w);
-    },500);
+      addAI(formatAIText(w));
+      setTimeout(()=>{ speak(w); }, 300);
+    }, 400);
   }
 }
 function closeSD(){
@@ -1109,7 +1743,7 @@ function addAI(t){
   removeThink();
   const c=document.getElementById('sdChat');
   const d=document.createElement('div');d.className='msg a';
-  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub"><p>${t}</p></div>`;
+  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub sd-ai-content">${t}</div>`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 function showThink(){
@@ -1141,13 +1775,14 @@ if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>window.spe
 // ════════════════════════════════════════════════════
 function showApiKeyModal(){
   const modal=document.getElementById('apiModal');
+  if(!modal)return;
   modal.classList.add('open');
   const saved=localStorage.getItem('sprayday_apikey')||'';
   const inp=document.getElementById('apiInp');
-  // Tampilkan masked jika sudah ada key
   inp.value=saved?saved:'';
-  inp.placeholder=saved?'sk-ant-... (sudah tersimpan, isi baru untuk ganti)':'sk-ant-api03-...';
-  document.getElementById('apiStatus').style.display='none';
+  inp.placeholder=saved?'sk-or-v1-... (key saved — enter new key to replace)':'sk-or-v1-...';
+  const st=document.getElementById('apiStatus');
+  if(st) st.style.display='none';
   updateApiKeyBtn();
 }
 
@@ -1159,36 +1794,75 @@ function saveApiKey(){
   const v=document.getElementById('apiInp').value.trim();
   const st=document.getElementById('apiStatus');
   if(!v){
-    st.className='api-status err';st.textContent='❌ API Key tidak boleh kosong.';st.style.display='block';return;
+    st.className='api-status err';st.textContent='❌ API Key cannot be empty.';st.style.display='block';return;
   }
-  if(!v.startsWith('AIza')){
-    st.className='api-status err';st.textContent='❌ Format salah. API Key Gemini harus dimulai dengan "AIza"';st.style.display='block';return;
+  if(!v.startsWith('sk-or-') && !v.startsWith('sk-ant-')){
+    st.className='api-status err';st.textContent='❌ Invalid key format. Key must start with sk-or- (OpenRouter) or sk-ant- (Anthropic)';st.style.display='block';return;
   }
   localStorage.setItem('sprayday_apikey',v);
-  st.className='api-status ok';st.textContent='✓ API Key berhasil disimpan! AI siap digunakan.';st.style.display='block';
+  st.className='api-status ok';st.textContent='✓ API Key saved! Testing connection...';st.style.display='block';
   updateApiKeyBtn();
-  sysLog('Gemini API Key tersimpan — AI aktif','lo');
-  setTimeout(closeApiModal,1200);
+  sysLog('API Key saved — testing AI connection...','lo');
+  // Test the key immediately
+  testApiKey(v, st);
+}
+
+async function testApiKey(key, statusEl){
+  try{
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+key,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'Sprayday AI'
+      },
+      body: JSON.stringify({
+        model:'anthropic/claude-sonnet-4-5',
+        max_tokens: 30,
+        messages:[{role:'system',content:'You are Sprayday AI.'},{role:'user',content:'Say OK'}]
+      })
+    });
+    if(resp.ok){
+      statusEl.className='api-status ok';
+      statusEl.textContent='✅ Connection successful! Sprayday AI is ready. You can start asking farming questions.';
+      sysLog('✅ AI connection verified — Sprayday AI ready','lo');
+      setTimeout(closeApiModal,2000);
+    } else {
+      const err = await resp.json().catch(()=>({}));
+      statusEl.className='api-status err';
+      statusEl.textContent='⚠ Key saved but connection test failed: ' + (err?.error?.message||'HTTP '+resp.status) + '. You can still try using the AI.';
+      sysLog('API key saved but test failed: '+(err?.error?.message||resp.status),'lw');
+      setTimeout(closeApiModal,3000);
+    }
+  } catch(e){
+    statusEl.className='api-status ok';
+    statusEl.textContent='✓ Key saved. Could not test connection (network issue) — try asking a question.';
+    setTimeout(closeApiModal,2000);
+  }
 }
 
 function updateApiKeyBtn(){
   const hasKey=!!localStorage.getItem('sprayday_apikey');
   const cls='api-key-btn'+(hasKey?' set':'');
   const lbl=hasKey?'✓ API KEY':'⚙ API KEY';
-  const b1=document.getElementById('apiKeyBtn');
-  const b2=document.getElementById('apiKeyBtnModal');
-  if(b1){b1.className=cls;b1.textContent=lbl;}
-  if(b2){b2.className=cls;b2.textContent=lbl;b2.style.fontSize='.44rem';}
+  ['apiKeyBtn','apiKeyBtnModal'].forEach(id=>{
+    const b=document.getElementById(id);
+    if(b){b.className=cls;b.textContent=lbl;}
+  });
 }
 
 // Cek API key saat load
-document.addEventListener('DOMContentLoaded',()=>{updateApiKeyBtn();});
+document.addEventListener('DOMContentLoaded',()=>{ updateApiKeyBtn(); });
 window.addEventListener('load',()=>{
   updateApiKeyBtn();
   if(!localStorage.getItem('sprayday_apikey')){
-    // Tampilkan reminder halus setelah load
     setTimeout(()=>{
-      sysLog('⚠ API Key belum diset — klik [⚙ API KEY] untuk mengaktifkan AI','lw');
+      sysLog('⚠ No API Key set — click [API KEY] button to activate Sprayday AI','lw');
+    },3500);
+  } else {
+    setTimeout(()=>{
+      sysLog('✓ Sprayday AI ready — API Key detected','lo');
     },3500);
   }
 });
