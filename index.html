@@ -710,7 +710,7 @@ document.getElementById('dispId').textContent = DEVICE_ID;
 let moisture=0, pump=false, manual=false;
 let mqttClient=null, mqttOk=false;
 let isRec=false, recog=null, talking=false, sdOpened=false;
-let logArr=[], chatMode='sensor';
+let logArr=[], chatMode='agri';
 let convHistory=[]; // For Claude API context
 
 // ════════════════════════════════════════════════════
@@ -1809,21 +1809,19 @@ function toggleMic(){
   startRec();
 }
 
-// AndroidManifest.xml must have: <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 function startRec(){
   if(!hasSR()){ showWarn('Voice not supported. Use text input.'); return; }
-  // Capacitor APK: go straight to SpeechRecognition (permission via AndroidManifest)
+  // APK Capacitor: langsung beginListening, permission dari AndroidManifest
   if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
     hideWarn(); beginListening(); return;
   }
-  // Browser: request mic first
+  // Browser: minta permission mic dulu
   if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
     navigator.mediaDevices.getUserMedia({audio:true,video:false})
       .then(s=>{ s.getTracks().forEach(t=>t.stop()); hideWarn(); beginListening(); })
       .catch(err=>{
-        const n=err.name||'';
-        if(n.includes('NotAllowed')||n.includes('Permission')){
-          addAI(formatAIText('**Microphone Blocked**\n\n**APK:** Settings > Apps > Sprayday AI > Permissions > Microphone > Allow\n\n**Browser:** Tap the lock icon in address bar > Microphone > Allow\n\nThen tap mic again.'));
+        if((err.name||'').match(/NotAllowed|Permission/i)){
+          addAI(formatAIText('**Microphone Blocked**\n\n**APK:** Settings > Apps > Sprayday AI > Permissions > Microphone > **Allow**\n\n**Browser:** Tap lock icon in address bar > Microphone > **Allow**\n\nThen tap mic again.'));
         } else { hideWarn(); beginListening(); }
       });
   } else { hideWarn(); beginListening(); }
@@ -1841,21 +1839,40 @@ function beginListening(){
   recog.onresult=e=>{
     const raw = Array.from(e.results[0]).map(a=>a.transcript).join(' ').trim();
     endRec();
-    // Wake word check
-    const hasWake = /^h[ae]y?l+[oa]\s+(spray\s*day|sprade|sprayday)/i.test(raw.trim());
-    if(hasWake){
-      const cmd = raw.replace(/^\S+\s+\S+\s*/,'').trim();
+    if(!raw){ return; }
+
+    const lower = raw.toLowerCase();
+    // Ambil 4 kata pertama untuk cek wake word
+    const first4 = lower.split(' ').slice(0,4).join(' ');
+
+    // Wake word detection — sangat toleran terhadap variasi ucapan
+    // Matches: "hello sprayday", "hello spray day", "hello spray",
+    //          "halo sprayday", "hi sprayday", "hey sprayday"
+    const hasHello = /^(hello|helo|hallo|halo|hay|hey|hi)/.test(lower);
+    const hasSpray = first4.includes('spray') || first4.includes('sprad') || first4.includes('espray');
+
+    if(hasHello && hasSpray){
+      // Strip wake word — hapus "hello [sprayday/spray day/spray]" dari depan
+      const cmd = raw
+        .replace(/^(hello|helo|hallo|halo|hay|hey|hi)\s*/i,'')
+        .replace(/^(spray\s*day|sprayday|sprade\w*|spray\w*)\s*/i,'')
+        .replace(/^[,.]?\s*/,'')
+        .trim();
+
       if(!cmd || cmd.length < 2){
-        addAI(formatAIText('Hello! I am listening. What would you like to know?'));
-        speak('Hello! I am listening.');
+        addAI(formatAIText('Hello! I am ready. What would you like to know or do?'));
+        speak('Hello! I am ready. What can I help you with?');
       } else {
-        addUser(cmd); processMessage(cmd);
+        addUser(cmd);
+        processMessage(cmd);
       }
     } else {
-      addAI(formatAIText('**Voice Tip:** Say **"Hello Sprayday"** before your command.\n\nExample: *"Hello Sprayday, turn on the pump"*\n\nOr **type** your question directly.'));
+      // Tidak ada wake word — langsung proses sebagai pertanyaan biasa
+      // (untuk typing, tidak perlu wake word — hanya voice yang perlu)
+      addUser(raw);
+      processMessage(raw);
     }
   };
-
   recog.onnomatch=()=>{endRec();addAI("I didn't catch that clearly. Please speak closer to the microphone and try again, or type your question in the text input below.");};
   recog.onerror=e=>{
     endRec();
@@ -1888,13 +1905,11 @@ function openSD(){
     sdOpened=true;
     convHistory=[];
     aiWorking=false;
-    const mStatus = moisture < 30 ? 'CRITICAL DRY' : moisture > 70 ? 'SATURATED' : moisture < 50 ? 'DRY' : 'OPTIMAL';
-    const wSpeak = 'Hello! Welcome to Sprayday AI. Soil moisture ' + moisture + ' percent, ' + mStatus + '.';
-    const wDisplay = '## Hello! Welcome to Sprayday AI\n\n**HYDRA-32 Sensor:** **' + moisture + '% moisture** - ' + mStatus + '\n\nAsk me anything about your farm. For voice, say **"Hello Sprayday, [command]"** or just type below.';
-    setTimeout(()=>{
-      addAI(formatAIText(wDisplay));
-      setTimeout(()=>{ speak(wSpeak); }, 300);
-    }, 400);
+    setMode('agri');
+    const mSt = moisture<30?'CRITICAL DRY':moisture>70?'SATURATED':moisture<50?'DRY':'OPTIMAL';
+    const wS = 'Hello, welcome to Sprayday AI. Soil moisture '+moisture+' percent, '+mSt+'.';
+    const wH = '## Hello! Welcome to Sprayday AI\n\n**HYDRA-32:** '+moisture+'% — **'+mSt+'**\n\nAsk anything about farming. For voice, say **"Hello Sprayday, [command]"** — or type below.';
+    setTimeout(()=>{ addAI(formatAIText(wH)); setTimeout(()=>speak(wS),400); },400);
   }
 }
 function closeSD(){
