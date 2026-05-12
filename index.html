@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#030d08">
-<title>Jababenda Project v1.0 | Sprayday Assistance</title>
+<title>Jababenda Project v3.0 | Sprayday AI System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
@@ -390,6 +390,49 @@ li.ai-li-num::before{content:none}
   color:var(--r);box-shadow:0 0 18px rgba(255,51,85,.12)}
 @keyframes nIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 
+
+/* ═══ TDS GAUGE ═══ */
+.tds-gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.tds-bar-wrap{width:100%;display:flex;flex-direction:column;gap:4px}
+.tds-value-big{font-family:var(--title);font-size:2rem;font-weight:900;color:var(--amber2);
+  text-align:center;text-shadow:0 0 14px rgba(240,192,64,.4)}
+.tds-unit{font-family:var(--mono);font-size:.55rem;letter-spacing:2px;color:var(--t3);text-align:center}
+.tds-track{height:10px;background:var(--bo);border-radius:99px;overflow:hidden;position:relative;margin:4px 0}
+.tds-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1),background .4s}
+.tds-markers{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.48rem;color:var(--t3)}
+.tds-status-badge{font-family:var(--mono);font-size:.6rem;letter-spacing:2px;padding:3px 10px;
+  border-radius:2px;text-align:center;margin-top:2px}
+.tds-low{background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.3);color:var(--r)}
+.tds-ok{background:rgba(45,255,122,.08);border:1px solid rgba(45,255,122,.3);color:var(--leaf)}
+.tds-high{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.3);color:var(--amber2)}
+
+/* ═══ RELAY CARDS ═══ */
+.relay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.relay-card{background:var(--bg3);border:1px solid var(--bo);border-radius:4px;
+  padding:10px 12px;display:flex;flex-direction:column;gap:5px;transition:border-color .3s}
+.relay-card.active{border-color:rgba(45,255,122,.35);background:rgba(45,255,122,.03)}
+.relay-card.spray-active{border-color:rgba(0,255,247,.35);background:rgba(0,255,247,.03)}
+.relay-header{display:flex;align-items:center;justify-content:space-between}
+.relay-label{font-family:var(--title);font-size:.52rem;font-weight:700;letter-spacing:1.5px;color:var(--t2)}
+.relay-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s}
+.relay-dot.on{background:var(--leaf);box-shadow:0 0 8px var(--leaf)}
+.relay-dot.spray-on{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.relay-gpio{font-family:var(--mono);font-size:.48rem;color:var(--t3);letter-spacing:1px}
+.relay-state{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.25);transition:color .3s}
+.relay-card.active .relay-state{color:var(--leaf)}
+.relay-card.spray-active .relay-state{color:var(--cyan)}
+.relay-desc{font-family:var(--mono);font-size:.48rem;color:var(--t3);letter-spacing:.5px}
+
+/* ═══ SENSOR ROW (moisture + TDS side by side) ═══ */
+.sensor-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:480px){.sensor-row{grid-template-columns:1fr;}}
+.relay-ctrl-btn{font-family:var(--mono);font-size:.5rem;letter-spacing:1px;
+  padding:4px 8px;border-radius:2px;border:1px solid var(--bo2);color:var(--t3);
+  background:transparent;cursor:pointer;transition:all .2s;margin-top:3px;width:100%}
+.relay-ctrl-btn:hover{border-color:var(--leaf);color:var(--leaf)}
+.relay-ctrl-btn.active-btn{border-color:var(--r);color:var(--r)}
+.relay-ctrl-btn.active-btn:hover{border-color:var(--r2);background:rgba(255,51,85,.08)}
+
 /* ═══ API KEY MODAL ═══ */
 #apiModal{position:fixed;inset:0;z-index:9500;
   background:rgba(1,6,2,.96);backdrop-filter:blur(18px);
@@ -487,9 +530,11 @@ li.ai-li-num::before{content:none}
     <div class="cdot wait" id="connDot"></div>
   </div>
 
-  <div class="g2">
+  <!-- ═══ SENSOR ROW: Soil Moisture + TDS side by side ═══ -->
+  <div class="sensor-row">
+    <!-- Soil Moisture Gauge -->
     <div class="pnl">
-      <div class="plbl">Soil Moisture</div>
+      <div class="plbl">🌱 Soil Moisture</div>
       <div class="gauge-wrap">
         <svg class="gauge-svg" viewBox="0 0 154 154" style="filter:drop-shadow(0 0 7px rgba(45,255,122,.2))">
           <circle cx="77" cy="77" r="64" fill="none" stroke="#0e2e14" stroke-width="8.5"/>
@@ -516,47 +561,135 @@ li.ai-li-num::before{content:none}
         <div class="tc-row"><div class="tc tc-d">DRY &lt;30%</div><div class="tc tc-w">WET &gt;70%</div></div>
       </div>
     </div>
+
+    <!-- TDS Nutrient Panel -->
     <div class="pnl">
-      <div class="plbl">Water Pump</div>
+      <div class="plbl">💧 TDS Nutrient Level</div>
+      <div class="tds-gauge-wrap">
+        <div class="tds-value-big" id="tdsValueBig">---</div>
+        <div class="tds-unit">PPM (Parts Per Million)</div>
+        <div class="tds-bar-wrap">
+          <div class="tds-track">
+            <div class="tds-fill" id="tdsBar" style="width:0%;background:#f0c040"></div>
+          </div>
+          <div class="tds-markers">
+            <span>0</span><span>300</span><span>600</span><span>1000</span>
+          </div>
+        </div>
+        <div class="tds-status-badge tds-ok" id="tdsStatus">READING...</div>
+        <div style="margin-top:8px">
+          <div class="spec-row"><span class="sk">SENSOR</span><span class="sv">GPIO 35</span></div>
+          <div class="spec-row"><span class="sk">LOW THRESH</span><span class="sv" style="color:var(--r)">&lt;300 ppm</span></div>
+          <div class="spec-row"><span class="sk">OK THRESH</span><span class="sv" style="color:var(--leaf)">&gt;600 ppm</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PUMP STATUS + ANALYTICS ═══ -->
+  <div class="g2" style="margin-bottom:12px">
+    <div class="pnl">
+      <div class="plbl">💧 Water Pump</div>
       <div class="pump-c">
         <div id="pOrb" class="pump-orb"><div class="pump-inner" id="pIcon">🔌</div></div>
         <div id="pState" class="pump-state">STANDBY</div>
         <div id="pSub" class="pump-sub">OFFLINE</div>
       </div>
       <div class="spec-list">
-        <div class="spec-row"><span class="sk">GPIO</span><span class="sv">PIN 25</span></div>
-        <div class="spec-row"><span class="sk">RELAY</span><span class="sv">ACTIVE-LOW</span></div>
-        <div class="spec-row"><span class="sk">SENSOR</span><span class="sv">GPIO 34</span></div>
+        <div class="spec-row"><span class="sk">GPIO</span><span class="sv">PIN 25 (Relay 1)</span></div>
+        <div class="spec-row"><span class="sk">TYPE</span><span class="sv">ACTIVE-LOW</span></div>
+        <div class="spec-row"><span class="sk">FUNCTION</span><span class="sv">MAIN WATER PUMP</span></div>
       </div>
     </div>
-  </div>
-
-  <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl">Sensor Analytics</div>
-    <div class="dbar"><span class="dbl">MOISTURE</span><div class="dbt"><div id="bM" class="dbf fg" style="width:0%"></div></div><span id="vM" class="dbv">--%</span></div>
-    <div class="dbar"><span class="dbl">DRY LIMIT</span><div class="dbt"><div class="dbf fr" style="width:30%"></div></div><span class="dbv" style="color:var(--r)">30%</span></div>
-    <div class="dbar"><span class="dbl">WET LIMIT</span><div class="dbt"><div class="dbf fg" style="width:70%"></div></div><span class="dbv" style="color:var(--leaf)">70%</span></div>
+    <div class="pnl">
+      <div class="plbl">📊 Sensor Analytics</div>
+      <div class="dbar"><span class="dbl">MOISTURE</span><div class="dbt"><div id="bM" class="dbf fg" style="width:0%"></div></div><span id="vM" class="dbv">--%</span></div>
+      <div class="dbar"><span class="dbl">DRY LIMIT</span><div class="dbt"><div class="dbf fr" style="width:30%"></div></div><span class="dbv" style="color:var(--r)">30%</span></div>
+      <div class="dbar"><span class="dbl">WET LIMIT</span><div class="dbt"><div class="dbf fg" style="width:70%"></div></div><span class="dbv" style="color:var(--leaf)">70%</span></div>
+      <div class="dbar" style="margin-top:8px"><span class="dbl">TDS LEVEL</span><div class="dbt"><div id="bTds" class="dbf" style="width:0%;background:#f0c040"></div></div><span id="vTds" class="dbv">-- ppm</span></div>
+      <div class="dbar"><span class="dbl">TDS LOW</span><div class="dbt"><div class="dbf fr" style="width:30%"></div></div><span class="dbv" style="color:var(--r)">300</span></div>
+      <div class="dbar"><span class="dbl">TDS OK</span><div class="dbt"><div class="dbf fg" style="width:60%"></div></div><span class="dbv" style="color:var(--leaf)">600</span></div>
+    </div>
   </div>
 
   <div class="pnl" style="margin-bottom:12px">
     <div class="plbl">Quick Actions</div>
     <div class="qa-grid">
-      <div class="qbtn q-on" onclick="sendCmd('pump_on')"><span class="qi">💧</span><span class="ql">ACTIVATE PUMP</span></div>
-      <div class="qbtn q-off" onclick="sendCmd('pump_off')"><span class="qi">🔌</span><span class="ql">DEACTIVATE PUMP</span></div>
-      <div class="qbtn q-data" onclick="qData()"><span class="qi">📊</span><span class="ql">VIEW DATA</span></div>
-      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🌿</span><span class="ql">ASK SPRAYDAY AI</span></div>
+      <div class="qbtn q-on" onclick="sendCmd('pump_on')"><span class="qi">💧</span><span class="ql">PUMP ON</span></div>
+      <div class="qbtn q-off" onclick="sendCmd('pump_off')"><span class="qi">🔌</span><span class="ql">PUMP OFF</span></div>
+      <div class="qbtn q-on" onclick="sendCmd('sol1_on')" style="border-color:rgba(0,255,247,.3)"><span class="qi">🌱</span><span class="ql">SOL-1 ON</span></div>
+      <div class="qbtn q-off" onclick="sendCmd('sol1_off')" style="border-color:rgba(0,255,247,.2)"><span class="qi">🌱</span><span class="ql">SOL-1 OFF</span></div>
+      <div class="qbtn q-on" onclick="sendCmd('sol2_on')" style="border-color:rgba(240,192,64,.3)"><span class="qi">🧪</span><span class="ql">SOL-2 ON</span></div>
+      <div class="qbtn q-off" onclick="sendCmd('sol2_off')" style="border-color:rgba(240,192,64,.2)"><span class="qi">🧪</span><span class="ql">SOL-2 OFF</span></div>
+      <div class="qbtn q-data" onclick="sendCmd('spray_now')"><span class="qi">🌿</span><span class="ql">SPRAY NOW</span></div>
+      <div class="qbtn q-ai" onclick="openSD()"><span class="qi">🤖</span><span class="ql">SPRAYDAY AI</span></div>
     </div>
   </div>
 
+  <!-- ═══ RELAY MONITOR & CONTROL PANEL ═══ -->
   <div class="pnl" style="margin-bottom:12px">
-    <div class="plbl">Control Panel</div>
-    <div class="ctrl-row">
-      <div><div class="ct">MANUAL MODE</div><div class="cs" id="manSub">AUTO LOGIC ACTIVE</div></div>
-      <label class="sw"><input type="checkbox" id="manToggle" onchange="doManual()"><span class="sl"></span></label>
+    <div class="plbl">⚡ Relay Monitor & Control</div>
+    <div class="relay-grid">
+      <!-- Relay 1 — Water Pump -->
+      <div class="relay-card" id="card_relay1">
+        <div class="relay-header">
+          <span class="relay-label">RELAY 1</span>
+          <div class="relay-dot" id="dot_relay1"></div>
+        </div>
+        <div class="relay-gpio">GPIO 25 — ACTIVE-LOW</div>
+        <div class="relay-state" id="state_relay1">OFF</div>
+        <div class="relay-desc">💧 Main Water Pump</div>
+        <button class="relay-ctrl-btn" id="btn_relay1" onclick="toggleRelay(1)">ACTIVATE</button>
+      </div>
+      <!-- Relay 2 — Solenoid 1 -->
+      <div class="relay-card" id="card_relay2">
+        <div class="relay-header">
+          <span class="relay-label">RELAY 2</span>
+          <div class="relay-dot" id="dot_relay2"></div>
+        </div>
+        <div class="relay-gpio">GPIO 26 — ACTIVE-LOW</div>
+        <div class="relay-state" id="state_relay2">OFF</div>
+        <div class="relay-desc">🌱 Solenoid 1 — Soil Irrigation</div>
+        <button class="relay-ctrl-btn" id="btn_relay2" onclick="toggleRelay(2)">OPEN SOL-1</button>
+      </div>
+      <!-- Relay 3 — Solenoid 2 -->
+      <div class="relay-card" id="card_relay3">
+        <div class="relay-header">
+          <span class="relay-label">RELAY 3</span>
+          <div class="relay-dot" id="dot_relay3"></div>
+        </div>
+        <div class="relay-gpio">GPIO 27 — ACTIVE-LOW</div>
+        <div class="relay-state" id="state_relay3">OFF</div>
+        <div class="relay-desc">🧪 Solenoid 2 — Fertilizer/TDS</div>
+        <button class="relay-ctrl-btn" id="btn_relay3" onclick="toggleRelay(3)">OPEN SOL-2</button>
+      </div>
+      <!-- Relay 4 — Solenoid 3 -->
+      <div class="relay-card" id="card_relay4">
+        <div class="relay-header">
+          <span class="relay-label">RELAY 4</span>
+          <div class="relay-dot" id="dot_relay4"></div>
+        </div>
+        <div class="relay-gpio">GPIO 14 — ACTIVE-LOW</div>
+        <div class="relay-state" id="state_relay4">OFF</div>
+        <div class="relay-desc">🌿 Solenoid 3 — Disinfectant Spray</div>
+        <button class="relay-ctrl-btn" id="btn_relay4" onclick="triggerSpray()">SPRAY NOW</button>
+      </div>
     </div>
-    <div class="ctrl-row">
-      <div><div class="ct">PUMP OVERRIDE</div><div class="cs">REQUIRES MANUAL MODE</div></div>
-      <label class="sw"><input type="checkbox" id="pToggle" onchange="doPump()" disabled><span class="sl"></span></label>
+    <!-- Mode & Pump toggle -->
+    <div style="margin-top:10px;border-top:1px solid var(--bo);padding-top:10px">
+      <div class="ctrl-row">
+        <div><div class="ct">SYSTEM MODE</div><div class="cs" id="manSub">AUTO LOGIC ACTIVE</div></div>
+        <label class="sw"><input type="checkbox" id="manToggle" onchange="doManual()"><span class="sl"></span></label>
+      </div>
+      <div class="ctrl-row">
+        <div><div class="ct">PUMP OVERRIDE</div><div class="cs">REQUIRES MANUAL MODE</div></div>
+        <label class="sw"><input type="checkbox" id="pToggle" onchange="doPump()" disabled><span class="sl"></span></label>
+      </div>
+    </div>
+    <!-- Spray status -->
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.55rem;color:var(--t3)">
+      <span>SPRAY SCHEDULE:</span>
+      <span id="sprayStatus" style="color:rgba(255,255,255,.4);letter-spacing:1px">STANDBY</span>
     </div>
   </div>
 
@@ -564,7 +697,7 @@ li.ai-li-num::before{content:none}
     <div class="plbl">System Log</div>
     <div class="logbox" id="logBox"></div>
   </div>
-  <div class="app-footer">JABABENDA PROJECT // SPRAYDAY ASSISTANT // AI AGRICULTURAL SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
+  <div class="app-footer">JABABENDA PROJECT // SPRAYDAY AI v3.0 // TDS + SOIL + 4-RELAY SYSTEM // <span id="footSync">NOT CONNECTED</span></div>
 </div>
 
 <!-- ═══════════════ API KEY MODAL ═══════════════ -->
@@ -666,6 +799,7 @@ li.ai-li-num::before{content:none}
       </button>
       <div class="mic-hint" id="micHint">TAP TO SPEAK</div>
       <div style="font-size:.5rem;color:rgba(45,255,122,.35);text-align:center;margin-top:3px;letter-spacing:1px;font-family:Orbitron,sans-serif">SAY: HELLO SPRAYDAY + COMMAND</div>
+      <div style="font-size:.5rem;color:rgba(45,255,122,.35);text-align:center;margin-top:3px;letter-spacing:1px;font-family:Orbitron,sans-serif">SAY: HELLO SPRAYDAY + COMMAND</div>
       <div style="margin-top:8px;display:flex;justify-content:center">
         <button id="muteBtn" onclick="toggleMute()" style="background:transparent;border:1px solid rgba(45,255,122,.25);color:rgba(45,255,122,.55);border-radius:20px;padding:3px 14px;font-size:.58rem;font-family:'Orbitron',sans-serif;letter-spacing:1.5px;cursor:pointer">
           🔊 VOICE ON
@@ -707,7 +841,7 @@ document.getElementById('dispId').textContent = DEVICE_ID;
 // ════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════
-let moisture=0, pump=false, manual=false;
+let moisture=0, tds=0, pump=false, sol1=false, sol2=false, sol3=false, manual=false, sprayActive=false;
 let mqttClient=null, mqttOk=false;
 let isRec=false, recog=null, talking=false, sdOpened=false;
 let logArr=[], chatMode='agri';
@@ -734,13 +868,13 @@ let convHistory=[]; // For Claude API context
 // ════════════════════════════════════════════════════
 //  LOADING
 // ════════════════════════════════════════════════════
-const lMsgs=['INITIALIZING...','LOADING CROP DATABASE...','CONNECTING TO MQTT CLOUD...','LOADING AI ENGINE...','CALIBRATING SENSORS...','SYSTEM ONLINE'];
+const lMsgs=['INITIALIZING SPRAYDAY v3.0...','LOADING CROP DATABASE...','CONNECTING TO MQTT CLOUD...','LOADING AI ENGINE...','CALIBRATING SOIL + TDS SENSORS...','4-RELAY SYSTEM ONLINE'];
 let lIdx=0;
 const lTmr=setInterval(()=>{if(++lIdx<lMsgs.length)document.getElementById('lsMsg').textContent=lMsgs[lIdx];else clearInterval(lTmr);},420);
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('load').classList.add('out');
-    sysLog('HYDRA-32 + Sprayday AI v6.0 loaded','lo');
+    sysLog('Sprayday AI v3.0 loaded','lo');
     sysLog(`Device: ${DEVICE_ID} | Broker: ${BROKER}`,'ll');
     initMQTT();
     renderChips();
@@ -752,21 +886,27 @@ window.addEventListener('load',()=>{
 // ════════════════════════════════════════════════════
 const CHIPS = {
   sensor:[
-    {l:'Activate Pump',a:()=>sendCmd('pump_on')},
-    {l:'Deactivate Pump',a:()=>sendCmd('pump_off')},
-    {l:'Monitoring Data',a:()=>runCmd('show current sensor data')},
-    {l:'Analyze & Advise',a:()=>runCmd('analyze soil and advise')},
-    {l:'Auto Mode',a:()=>sendCmd('auto_mode')},
-    {l:'Manual Mode',a:()=>sendCmd('manual_mode')},
+    {l:'💧 Pump ON',       a:()=>sendCmd('pump_on')},
+    {l:'🔌 Pump OFF',      a:()=>sendCmd('pump_off')},
+    {l:'🌱 Sol-1 ON',      a:()=>sendCmd('sol1_on')},
+    {l:'🌱 Sol-1 OFF',     a:()=>sendCmd('sol1_off')},
+    {l:'🧪 Sol-2 ON',      a:()=>sendCmd('sol2_on')},
+    {l:'🧪 Sol-2 OFF',     a:()=>sendCmd('sol2_off')},
+    {l:'🌿 Sol-3 ON',      a:()=>sendCmd('sol3_on')},
+    {l:'🌿 Sol-3 OFF',     a:()=>sendCmd('sol3_off')},
+    {l:'🌿 Spray Now',     a:()=>sendCmd('spray_now')},
+    {l:'📊 Sensor Data',   a:()=>runCmd('tampilkan semua data sensor: soil moisture dan TDS nutrient level saat ini')},
+    {l:'🤖 Auto Mode',     a:()=>sendCmd('auto_mode')},
+    {l:'🔧 Manual Mode',   a:()=>sendCmd('manual_mode')},
   ],
   agri:[
     {l:'🌾 Grow Rice',a:()=>{setMode('agri');runCmd('Give me a complete guide to growing rice — best varieties, land preparation, fertilization schedule with exact doses, water management, pest control, and how to maximize yield per hectare.');},cls:'agri'},
     {l:'☕ Grow Coffee',a:()=>{setMode('agri');runCmd('I want to start a coffee plantation. Give me the full guide: Arabica vs Robusta, land preparation, planting spacing, annual fertilization, pruning, pest management, harvest, and how to reach export quality.');},cls:'agri'},
     {l:'🌶 Grow Chili',a:()=>{setMode('agri');runCmd('How do I grow chili peppers on a large scale profitably? Cover everything: land prep, best varieties, transplanting, fertilization schedule, irrigation, thrips and disease control, and harvest for fresh market vs export.');},cls:'agri'},
-    {l:'🧅 Grow Onion',a:()=>{setMode('agri');runCmd('Give me a complete red onion growing guide: land preparation, planting with mulch, fertilization schedule including the critical high-potassium phase, irrigation with HYDRA-32, pest and disease control, and how to achieve export-grade quality.');},cls:'agri'},
+    {l:'🧅 Grow Onion',a:()=>{setMode('agri');runCmd('Give me a complete red onion growing guide: land preparation, planting with mulch, fertilization schedule including the critical high-potassium phase, irrigation with Sprayday, pest and disease control, and how to achieve export-grade quality.');},cls:'agri'},
     {l:'💊 Fertilizer Guide',a:()=>{setMode('agri');runCmd('Explain fertilizers completely: organic vs chemical, what NPK means, which nutrients do what, recommended application schedules and doses for tropical crops, and how to diagnose nutrient deficiencies from plant symptoms.');},cls:'agri'},
     {l:'🐛 Pest & Disease',a:()=>{setMode('agri');runCmd('What are the most dangerous pests and diseases in tropical farming, how do I identify them in the field, and what is the most effective treatment for each — including both chemical and biological control options?');},cls:'agri'},
-    {l:'💧 Irrigation Tips',a:()=>{setMode('agri');runCmd('Explain modern irrigation best practices for tropical farming. Cover drip vs sprinkler vs flood irrigation, how to read my HYDRA-32 sensor data, optimal moisture levels for different crops, and when exactly to irrigate.');},cls:'agri'},
+    {l:'💧 Irrigation Tips',a:()=>{setMode('agri');runCmd('Explain modern irrigation best practices for tropical farming. Cover drip vs sprinkler vs flood irrigation, how to read my Sprayday sensor data, optimal moisture levels for different crops, and when exactly to irrigate.');},cls:'agri'},
     {l:'📅 Planting Calendar',a:()=>{setMode('agri');runCmd('Create a detailed planting and farm management calendar for tropical Indonesia — wet season vs dry season crops, best planting windows, crop rotation recommendations, and monthly tasks for the whole year.');},cls:'agri'},
   ]
 };
@@ -941,7 +1081,7 @@ Apply in 2 splits: start and end of rainy season.
 **4. Irrigation:**
 - Critical: never let soil dry below 40% moisture — causes blossom drop
 - Drip irrigation preferred: 0.5–1 L/plant/day during vegetative; 1–2 L during fruiting
-- HYDRA-32 optimal range: 50–65% soil moisture for chili
+- Sprayday optimal range: 50–65% soil moisture for chili
 
 **5. Major Pests & Diseases:**
 - **Thrips:** Spinosad 0.4 ml/L — spray undersides of leaves, alternating with Abamectin
@@ -1019,7 +1159,7 @@ Apply in 2 splits: start and end of rainy season.
 | Red onion | 400–600 mm | Bulb enlargement |
 | Coffee | 1,500–2,000 mm/year | Flowering, cherry development |
 
-**HYDRA-32 Sensor Interpretation:**
+**Sprayday Sensor Interpretation:**
 - **Moisture < 30%** 🔴 CRITICAL: Activate pump immediately — plant wilting point approaching
 - **Moisture 30–50%** 🟡 DRY: Irrigation recommended within 24 hours
 - **Moisture 50–70%** 🟢 OPTIMAL: Ideal range for most crops — no action needed
@@ -1080,7 +1220,7 @@ Red onion (Allium cepa var. aggregatum) is one of Indonesia's most valuable expo
 💡 **Expert tip:** High potassium (K) in weeks 6–8 is the secret to large, firm, export-quality bulbs. Don't skip it!
 
 **5. Water Management:**
-- Critical period: bulb enlargement week 5–8 — keep moisture 50–65% (HYDRA-32 optimal zone)
+- Critical period: bulb enlargement week 5–8 — keep moisture 50–65% (Sprayday optimal zone)
 - Irrigation frequency: every 2–3 days for sandy soil, every 3–4 days for clay loam
 - **Stop irrigation 7–10 days before harvest** — essential for dry outer skin (curing)
 - Drip irrigation ideal: reduces purple blotch risk by 60% vs sprinkler
@@ -1134,7 +1274,7 @@ Red onion (Allium cepa var. aggregatum) is one of Indonesia's most valuable expo
 | Chili | Apr–Jun | Premium price in dry season |
 | Watermelon/Melon | Apr–May | Needs irrigation but excellent quality |
 | Groundnut | Apr–May | High yield in well-drained soil |
-| Dry-season rice | Apr–May | Requires reliable irrigation (HYDRA-32!) |
+| Dry-season rice | Apr–May | Requires reliable irrigation (Sprayday!) |
 | Tobacco | Jun–Jul | Only suitable dry-season crop |
 
 **Monthly Farm Management Calendar:**
@@ -1360,7 +1500,7 @@ async function callClaudeAI(userMessage, systemPrompt){
 
 function generateFallback(question, systemPrompt){
   const q = question.toLowerCase();
-  const isSensor = systemPrompt.includes('HYDRA-32');
+  const isSensor = systemPrompt.includes('Sprayday System');
 
   if(isSensor){
     const cond = moisture < 30 ? 'CRITICAL DRY — immediate irrigation required'
@@ -1370,7 +1510,7 @@ function generateFallback(question, systemPrompt){
     const advice = moisture < 30 ? '⚠️ **Action Required:** Activate the pump immediately. Soil is dangerously dry and plants may be wilting.'
                  : moisture > 70 ? '💧 **Action Required:** Deactivate pump. Excess moisture causes anaerobic conditions and root disease.'
                  : '✅ **Status:** Irrigation system is performing well. Continue monitoring.';
-    return `**📊 HYDRA-32 Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
+    return `**📊 Sprayday Sensor Analysis**\n\n**Soil Moisture:** ${moisture}% — ${cond}\n**Water Pump:** ${pump ? '🟢 ACTIVE — Running' : '⚫ STANDBY — Offline'}\n**System Mode:** ${manual ? '🔧 MANUAL Override' : '🤖 AUTO Control'}\n\n**Dry Threshold:** 30% | **Wet Threshold:** 70%\n\n${advice}`;
   }
 
   const kbCtx = getKBContext(question);
@@ -1383,7 +1523,7 @@ const AGRI_SYSTEM = `# ROLE
 You are SPRAYDAY AI, the world's most advanced Agricultural Intelligence Assistant and expert Agrotech Mentor. Your mission is to provide professional, highly detailed, and deeply informative guidance to farmers and agricultural students at every level, from complete beginners to commercial growers targeting export markets.
 
 # ABSOLUTE LANGUAGE RULE
-ALWAYS respond in English, regardless of what language the user writes in. This is non-negotiable. If the user writes in Indonesian or any other language, your response must still be in clear, natural English.
+ALWAYS respond in the SAME language as the user. If the user writes in Indonesian (Bahasa Indonesia), respond in Indonesian. If in English, respond in English. Match their language naturally.
 
 # PERSONALITY AND TONE
 Be conversational and fluid. Avoid robotic or overly formal phrasing. Use natural transitions like 'That's a great question,' 'Let's dig into that,' 'Interestingly,' 'Here's the thing most farmers miss,' and 'Let me walk you through this.' You are a mentor, not a manual.
@@ -1403,14 +1543,17 @@ Never be dismissive. If a user has made a mistake in their farming logic, correc
 
 **Sustainable Practices:** Expert in crop rotation (breaking disease and pest cycles), intercropping systems (e.g., banana or lamtoro for shade and nitrogen fixation with coffee), cover cropping, composting, biological pest control, and reduced-chemical IPM strategies.
 
-**Tech Integration:** Fully conversant in IoT in agriculture: ESP32/Arduino sensor systems, soil moisture sensors, automated irrigation logic, threshold-based pump control, HYDRA-32 sensor data interpretation, and smart farm management systems.
+**Tech Integration:** Fully conversant in IoT in agriculture: ESP32/Arduino sensor systems, soil moisture sensors, automated irrigation logic, threshold-based pump control, Sprayday sensor data interpretation, and smart farm management systems.
 
 **Farm Economics:** Able to discuss cost-per-hectare analysis, yield targets, market timing, export quality standards (grading, sizing, moisture content, packaging), price premiums, and how to make farming profitable at scale.
 
-# LIVE SENSOR DATA (HYDRA-32 System)
-Current soil moisture reading: MOISTURE_PLACEHOLDER%
-Water pump status: PUMP_PLACEHOLDER
-System mode: MODE_PLACEHOLDER
+# LIVE SENSOR DATA (Sprayday System)
+Current soil moisture: MOISTURE_PLACEHOLDER%
+TDS / nutrient level: TDS_PLACEHOLDER ppm (300-600 ppm optimal for most crops)
+Water pump: PUMP_PLACEHOLDER | Mode: MODE_PLACEHOLDER
+Solenoid 1 (soil irrigation): SOL1_PLACEHOLDER
+Solenoid 2 (fertilizer dosing): SOL2_PLACEHOLDER
+Solenoid 3 (disinfectant spray): SOL3_PLACEHOLDER
 
 Moisture guide: 0-30% = CRITICAL DRY (irrigate now), 30-50% = DRY (irrigate within 24hr), 50-70% = OPTIMAL, 70-85% = WET (hold irrigation), 85-100% = SATURATED (stop pump, root rot risk).
 
@@ -1443,19 +1586,23 @@ When a user asks how to grow or manage a crop, use these sections:
 
 
 const SENSOR_SYSTEM = `# ROLE
-You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the HYDRA-32 precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
+You are SPRAYDAY AI, an expert Agricultural Intelligence Assistant integrated with the Sprayday precision irrigation system. You combine deep agronomic knowledge with real-time sensor data to give farmers smart, specific, and actionable irrigation guidance.
 
 # ABSOLUTE LANGUAGE RULE
-ALWAYS respond in English, regardless of what language the user writes in. This is non-negotiable.
+ALWAYS respond in the SAME language as the user. Indonesian → Indonesian, English → English.
 
 # PERSONALITY AND TONE
 Be conversational, warm, and mentor-like. Never just read out a number. Explain what it means for the plant, the soil, and what the farmer should do right now and in the next 24 hours.
 
 # LIVE SENSOR DATA
 Current soil moisture: MOISTURE_PLACEHOLDER%
+TDS / nutrient level: TDS_PLACEHOLDER ppm
 Water pump status: PUMP_PLACEHOLDER
+Solenoid 1 (irrigation): SOL1_PLACEHOLDER
+Solenoid 2 (fertilizer): SOL2_PLACEHOLDER
+Solenoid 3 (disinfectant): SOL3_PLACEHOLDER
 System mode: MODE_PLACEHOLDER
-Auto thresholds: Pump ON below 30% | Pump OFF above 70%
+Auto thresholds: Soil pump below 30% | TDS fertilize below 300ppm | Spray 3x/week 20s
 
 Interpretation: 0-30% = CRITICAL (activate pump now), 30-50% = DRY (irrigate within 12-24hr), 50-70% = OPTIMAL, 70-85% = WET (hold irrigation), 85-100% = SATURATED (stop pump, root rot risk).
 
@@ -1470,6 +1617,10 @@ Use ⚠ **Warning:** when the moisture level poses a risk to the crop.`
 function getSensorContext(sys){
   return sys
     .replace('MOISTURE_PLACEHOLDER', moisture)
+    .replace('TDS_PLACEHOLDER', tds)
+    .replace('SOL1_PLACEHOLDER', sol1 ? 'OPEN' : 'CLOSED')
+    .replace('SOL2_PLACEHOLDER', sol2 ? 'OPEN' : 'CLOSED')
+    .replace('SOL3_PLACEHOLDER', sol3 ? 'OPEN' : 'CLOSED')
     .replace('PUMP_PLACEHOLDER', pump ? 'ACTIVE — pump is running' : 'STANDBY — pump is offline')
     .replace('MODE_PLACEHOLDER', manual ? 'MANUAL override (user-controlled)' : 'AUTO control (threshold-based)');
 }
@@ -1527,7 +1678,8 @@ async function processMessage(input){
       const cond = moisture<30?'🔴 CRITICAL DRY':moisture>70?'🔵 SATURATED':moisture<50?'🟡 DRY':'🟢 OPTIMAL';
       const advice = moisture<30?'Activate pump immediately — plants are approaching wilting point.':moisture>70?'Deactivate pump. Excess moisture causes root rot and disease.':moisture<50?'Irrigation recommended within the next 12–24 hours.':'No irrigation needed. System is performing excellently.';
       removeThink(); aiWorking=false;
-      respond(`📊 **REAL-TIME SENSOR DATA**\n\n🌱 **Soil Moisture:** ${moisture}% — ${cond}\n💧 **Water Pump:** ${pump?'🟢 ACTIVE — Running':'⚫ STANDBY — Offline'}\n⚙️ **System Mode:** ${manual?'🔧 MANUAL Override':'🤖 AUTO Control'}\n\n📏 Dry Threshold: 30% | Wet Threshold: 70%\n\n💡 **Recommendation:** ${advice}`);
+      const tdsCond = tds<300?'⚠️ LOW — Nutrisi Kurang':tds>600?'✅ OPTIMAL':'🟡 Normal';
+      respond(`📊 **REAL-TIME SENSOR DATA — Sprayday System**\n\n🌱 **Soil Moisture:** ${moisture}% — ${cond}\n💧 **TDS Nutrient:** ${tds} ppm — ${tdsCond}\n\n**Relay Status:**\n- Relay 1 (Pump GPIO 25): ${pump?'🟢 ACTIVE':'⚫ OFF'}\n- Relay 2 (Sol-1 GPIO 26): ${sol1?'🟢 OPEN':'⚫ CLOSED'}\n- Relay 3 (Sol-2 GPIO 27): ${sol2?'🟢 OPEN':'⚫ CLOSED'}\n- Relay 4 (Sol-3 GPIO 14): ${sol3?'🟢 OPEN':'⚫ CLOSED'}\n\n⚙️ **Mode:** ${manual?'🔧 MANUAL Override':'🤖 AUTO Control'} | Spray: ${sprayActive?'🌿 ACTIVE':'STANDBY'}\n\n💡 **Recommendation:** ${advice}`);
       return;
     }
     // Analyze & advise (without AI if no key)
@@ -1908,7 +2060,7 @@ function openSD(){
     setMode('agri');
     const mSt = moisture<30?'CRITICAL DRY':moisture>70?'SATURATED':moisture<50?'DRY':'OPTIMAL';
     const wS = 'Hello, welcome to Sprayday AI. Soil moisture '+moisture+' percent, '+mSt+'.';
-    const wH = '## Hello! Welcome to Sprayday AI\n\n**HYDRA-32:** '+moisture+'% — **'+mSt+'**\n\nAsk anything about farming. For voice, say **"Hello Sprayday, [command]"** — or type below.';
+    const wH = '## Hello! Welcome to Sprayday AI\n\n🌱 **Soil Moisture:** '+moisture+'% — **'+mSt+'** | 💧 **TDS:** '+tds+' ppm\n\nSaya siap membantu pertanian Anda! Tanya apa saja atau kontrol sistem irigasi. Ucapkan **"Hello Sprayday, [perintah]"** untuk suara.';
     setTimeout(()=>{ addAI(formatAIText(wH)); setTimeout(()=>speak(wS),400); },400);
   }
 }
@@ -1949,25 +2101,114 @@ function pubCmd(cmd){if(!mqttClient||!mqttOk)return;const m=new Paho.MQTT.Messag
 function sendCmd(cmd){
   if(!mqttOk){showNotif('Not connected to ESP32','err');return;}
   pubCmd(cmd);
-  const labels={pump_on:'Activating pump...',pump_off:'Deactivating pump...',auto_mode:'Switching to AUTO...',manual_mode:'Switching to MANUAL...'};
+  const labels={pump_on:'Activating pump...',pump_off:'Deactivating pump...',auto_mode:'Switching to AUTO...',manual_mode:'Switching to MANUAL...',sol1_on:'Opening Solenoid 1...',sol1_off:'Closing Solenoid 1...',sol2_on:'Opening Solenoid 2...',sol2_off:'Closing Solenoid 2...',sol3_on:'Opening Solenoid 3...',sol3_off:'Closing Solenoid 3...',spray_now:'Triggering spray...'};
   showNotif(labels[cmd]||cmd,'ok');sysLog('CMD: '+cmd,'ll');
 }
 function updateData(d){
-  const pp=pump,pm=manual;
-  if(d.moisture!==undefined)moisture=d.moisture;
-  if(d.pump!==undefined)pump=d.pump;
-  if(d.manual!==undefined)manual=d.manual;
-  updateGauge(moisture);updatePumpUI(pump);
+  const pp=pump, pm=manual;
+  if(d.moisture!==undefined) moisture=d.moisture;
+  if(d.tds!==undefined)      tds=d.tds;
+  if(d.pump!==undefined)     pump=d.pump;
+  if(d.sol1!==undefined)     sol1=d.sol1;
+  if(d.sol2!==undefined)     sol2=d.sol2;
+  if(d.sol3!==undefined)     sol3=d.sol3;
+  if(d.manual!==undefined)   manual=d.manual;
+  if(d.spray!==undefined)    sprayActive=d.spray;
+
+  updateGauge(moisture);
+  updatePumpUI(pump);
+  updateTdsUI(tds);
+  updateAllRelayCards();
+
   const mp=document.getElementById('modePill');
-  mp.textContent=manual?'◆ MANUAL MODE':'◆ AUTO MODE';mp.className='mode-pill'+(manual?' man':'');
+  mp.textContent=manual?'◆ MANUAL MODE':'◆ AUTO MODE';
+  mp.className='mode-pill'+(manual?' man':'');
   document.getElementById('manToggle').checked=manual;
-  document.getElementById('pToggle').checked=pump;document.getElementById('pToggle').disabled=!manual;
+  document.getElementById('pToggle').checked=pump;
+  document.getElementById('pToggle').disabled=!manual;
   document.getElementById('manSub').textContent=manual?'MANUAL OVERRIDE ACTIVE':'AUTO LOGIC ACTIVE';
-  const now=new Date().toLocaleTimeString('en-US',{hour12:false});
-  document.getElementById('dispSync').textContent=now;document.getElementById('footSync').textContent='SYNCED '+now;
-  if(pp!==pump)sysLog('Pump: '+(pump?'ACTIVE':'OFFLINE'),pump?'lo':'lw');
-  if(pm!==manual)sysLog('Mode: '+(manual?'MANUAL':'AUTO'),manual?'lw':'lo');
+
+  const now=new Date().toLocaleTimeString('en-ID',{hour12:false});
+  document.getElementById('dispSync').textContent=now;
+  document.getElementById('footSync').textContent='SYNCED '+now;
+
+  if(pp!==pump) sysLog('Pump: '+(pump?'ACTIVE':'OFFLINE'), pump?'lo':'lw');
+  if(pm!==manual) sysLog('Mode: '+(manual?'MANUAL':'AUTO'), manual?'lw':'lo');
 }
+
+function updateTdsUI(ppm){
+  // Big value display
+  const bigEl = document.getElementById('tdsValueBig');
+  if(bigEl){ bigEl.textContent = ppm + ' ppm';
+    bigEl.style.color = ppm<300?'var(--r)':ppm>600?'var(--leaf)':'var(--amber2)'; }
+  // Progress bar (0-1000 range)
+  const bar = document.getElementById('tdsBar');
+  if(bar){ const pct=Math.min(ppm/1000*100,100); bar.style.width=pct+'%';
+    bar.style.background=ppm<300?'#ff4466':ppm>600?'#2dff7a':'#f0c040'; }
+  // Analytics bar
+  const bTds = document.getElementById('bTds');
+  if(bTds){ bTds.style.width=Math.min(ppm/1000*100,100)+'%';
+    bTds.style.background=ppm<300?'#ff4466':ppm>600?'#2dff7a':'#f0c040'; }
+  const vTds = document.getElementById('vTds');
+  if(vTds) vTds.textContent=ppm+' ppm';
+  // Status badge
+  const st = document.getElementById('tdsStatus');
+  if(st){
+    if(ppm<300){ st.textContent='⚠ LOW — Nutrisi Kurang'; st.className='tds-status-badge tds-low'; }
+    else if(ppm>600){ st.textContent='✓ OPTIMAL — Nutrisi Baik'; st.className='tds-status-badge tds-ok'; }
+    else { st.textContent='◌ NORMAL — Dalam Batas'; st.className='tds-status-badge tds-high'; }
+  }
+}
+
+function updateAllRelayCards(){
+  // Relay 1: Water Pump (GPIO 25)
+  updateRelayCard(1, pump, pump?'ACTIVE':'OFF', pump?'DEACTIVATE':'ACTIVATE');
+  // Relay 2: Solenoid 1 - Soil Irrigation (GPIO 26)
+  updateRelayCard(2, sol1, sol1?'OPEN':'CLOSED', sol1?'CLOSE SOL-1':'OPEN SOL-1');
+  // Relay 3: Solenoid 2 - Fertilizer/TDS (GPIO 27)
+  updateRelayCard(3, sol2, sol2?'OPEN':'CLOSED', sol2?'CLOSE SOL-2':'OPEN SOL-2');
+  // Relay 4: Solenoid 3 - Disinfectant Spray (GPIO 14)
+  const isSpray = sol3 || sprayActive;
+  updateRelayCard(4, isSpray, isSpray?'SPRAYING':'STANDBY', isSpray?'STOP SPRAY':'SPRAY NOW', isSpray);
+
+  // Spray status text
+  const spEl = document.getElementById('sprayStatus');
+  if(spEl){ spEl.textContent=sprayActive?'🌿 SPRAYING...':'STANDBY — 3x/WEEK AUTO';
+    spEl.style.color=sprayActive?'var(--cyan)':'rgba(255,255,255,.4)'; }
+}
+
+function updateRelayCard(num, isOn, stateText, btnText, isSpray){
+  const card = document.getElementById('card_relay'+num);
+  const dot  = document.getElementById('dot_relay'+num);
+  const state= document.getElementById('state_relay'+num);
+  const btn  = document.getElementById('btn_relay'+num);
+  if(!card) return;
+  card.className = 'relay-card' + (isOn?(isSpray?' spray-active':' active'):'');
+  if(dot){ dot.className='relay-dot'+(isOn?(isSpray?' spray-on':' on'):''); }
+  if(state){ state.textContent=stateText; }
+  if(btn){
+    btn.textContent=btnText;
+    btn.className='relay-ctrl-btn'+(isOn?' active-btn':'');
+  }
+}
+
+// Toggle relay from button click
+function toggleRelay(num){
+  if(!mqttOk){ showNotif('Not connected to ESP32','err'); return; }
+  if(!manual && num!==1){ showNotif('Switch to MANUAL mode first','err'); return; }
+  const states = [pump, sol1, sol2, sol3];
+  const isOn = states[num-1];
+  const cmds = {
+    1: isOn?'pump_off':'pump_on',
+    2: isOn?'sol1_off':'sol1_on',
+    3: isOn?'sol2_off':'sol2_on',
+    4: 'spray_now'
+  };
+  sendCmd(cmds[num]);
+}
+function triggerSpray(){ if(!mqttOk){ showNotif('Not connected','err'); return; } sendCmd('spray_now'); }
+
+function updateSolenoidUI(){ updateAllRelayCards(); } // backward compat
 function doManual(){sendCmd(document.getElementById('manToggle').checked?'manual_mode':'auto_mode');}
 function doPump(){if(!manual){document.getElementById('pToggle').checked=pump;return;}sendCmd(document.getElementById('pToggle').checked?'pump_on':'pump_off');}
 function qData(){openSD();setTimeout(()=>runCmd('show current sensor and moisture data'),700);}
@@ -2051,7 +2292,66 @@ function showThink(){
   removeThink();
   const c=document.getElementById('sdChat');
   const d=document.createElement('div');d.className='msg a';d.id='thinkEl';
-  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub"><div class="think-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>`;
+  d.innerHTML=`<div class="mlbl">SPRAYDAY AI</div><div class="mbub"><div class="think-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>
+    <!-- TDS Sensor Panel -->
+    <div class="pnl" style="margin-top:8px">
+      <div class="plbl">TDS / Nutrient Level</div>
+      <div style="padding:8px 12px 10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span id="tdsValue" style="font-family:Orbitron,sans-serif;font-size:1.4rem;color:#2dff7a;letter-spacing:2px">0 ppm</span>
+          <span id="tdsStatus" style="font-size:.6rem;letter-spacing:1.5px;font-family:Orbitron,sans-serif;color:#f0c040">READING...</span>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:6px">
+          <div id="tdsBar" style="height:100%;width:0%;background:#f0c040;border-radius:4px;transition:width .6s,background .4s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:.55rem;color:rgba(255,68,102,.6);font-family:Orbitron,sans-serif;letter-spacing:1px">LOW &lt;300</span>
+          <span style="font-size:.55rem;color:#f0c040;font-family:Orbitron,sans-serif;letter-spacing:1px">NORMAL 300-600</span>
+          <span style="font-size:.55rem;color:rgba(45,255,122,.6);font-family:Orbitron,sans-serif;letter-spacing:1px">OPTIMAL &gt;600</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solenoid Status Panel -->
+    <div class="pnl" style="margin-top:8px">
+      <div class="plbl">Solenoid Valves</div>
+      <div style="padding:8px 12px 10px;display:flex;flex-direction:column;gap:8px">
+
+        <!-- Solenoid 1 -->
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="dot_sol1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .4s"></div>
+            <span style="font-size:.65rem;font-family:Orbitron,sans-serif;letter-spacing:1.2px;color:rgba(255,255,255,.6)">SOL-1 IRRIGATION</span>
+          </div>
+          <span id="lbl_sol1" style="font-size:.6rem;font-family:Orbitron,sans-serif;letter-spacing:1px;color:rgba(255,255,255,.35)">OFF</span>
+        </div>
+
+        <!-- Solenoid 2 -->
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="dot_sol2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .4s"></div>
+            <span style="font-size:.65rem;font-family:Orbitron,sans-serif;letter-spacing:1.2px;color:rgba(255,255,255,.6)">SOL-2 FERTILIZER</span>
+          </div>
+          <span id="lbl_sol2" style="font-size:.6rem;font-family:Orbitron,sans-serif;letter-spacing:1px;color:rgba(255,255,255,.35)">OFF</span>
+        </div>
+
+        <!-- Solenoid 3 -->
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="dot_sol3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .4s"></div>
+            <span style="font-size:.65rem;font-family:Orbitron,sans-serif;letter-spacing:1.2px;color:rgba(255,255,255,.6)">SOL-3 DISINFECTANT</span>
+          </div>
+          <span id="lbl_sol3" style="font-size:.6rem;font-family:Orbitron,sans-serif;letter-spacing:1px;color:rgba(255,255,255,.35)">OFF</span>
+        </div>
+
+        <!-- Spray Status -->
+        <div style="margin-top:4px;padding-top:8px;border-top:1px solid rgba(45,255,122,.08);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:.6rem;font-family:Orbitron,sans-serif;letter-spacing:1.2px;color:rgba(0,255,247,.5)">DISINFECTANT SCHEDULE</span>
+          <span id="sprayStatus" style="font-size:.6rem;font-family:Orbitron,sans-serif;letter-spacing:1px;color:rgba(255,255,255,.35)">STANDBY</span>
+        </div>
+      </div>
+    </div>
+`;
   c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 function removeThink(){const t=document.getElementById('thinkEl');if(t)t.remove();}
